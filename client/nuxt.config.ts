@@ -26,5 +26,11 @@ export default defineNuxtConfig({
     preset: 'node-server',
     port: 8080,
     host: '0.0.0.0'
-  }
+  },
+    runtimeConfig: {
+        public: {
+            apiBaseUrl: process.env.API_BASE_URL || 'http://localhost:3000',
+        }
+    },
+
 })

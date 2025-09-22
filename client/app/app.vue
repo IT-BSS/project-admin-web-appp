@@ -10,5 +10,6 @@
 
 body {
   font-family: 'Montserrat', sans-serif;
+  background-color: #333333;
 }
 </style>
