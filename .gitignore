@@ -30,7 +30,7 @@ pnpm-lock.yaml
 /.cache
 
 # --- SQL файлы ---
-*.sql
+
 
 # --- IDE и редакторы ---
 # VSCode
