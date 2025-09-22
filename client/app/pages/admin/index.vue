@@ -6,5 +6,5 @@
 </template>
 
 <script setup lang="ts">
-import UsersPanel from "../components/panelUsers.vue";
+import UsersPanel from "../../components/panelUsers.vue";
 </script>
