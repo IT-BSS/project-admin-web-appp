@@ -1,0 +1,26 @@
+# Dockerfile для разработки с nodemon
+FROM node:18-alpine
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Устанавливаем pnpm
+RUN npm install -g pnpm
+
+# Копируем package.json и pnpm-lock.yaml
+COPY package.json pnpm-lock.yaml ./
+
+# Устанавливаем зависимости
+RUN pnpm install
+
+# Копируем исходный код
+COPY . .
+
+# Создаем папку для логов
+RUN mkdir -p logs
+
+# Открываем порт
+EXPOSE 3000
+
+# Запускаем в режиме разработки с nodemon
+CMD ["pnpm", "run", "dev"]

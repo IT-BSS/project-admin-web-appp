@@ -1,6 +1,14 @@
 <template>
-  <div>
+  <div id="app">
     <NuxtRouteAnnouncer />
-    <NuxtWelcome />
+    <NuxtPage />
   </div>
 </template>
+
+<style lang="scss">
+@import "../styles/normalize.css";
+
+body {
+  font-family: 'Montserrat', sans-serif;
+}
+</style>

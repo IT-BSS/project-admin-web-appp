@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # Сервис для разработки с nodemon
+  bss2-server-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+    volumes:
+      - ./src:/app/src
+      - ./logs:/app/logs
+      - /app/node_modules
+    restart: unless-stopped
+    networks:
+      - bss2-network
+
+  # Сервис для продакшена
+  bss2-server-prod:
+    build: .
+    ports:
+      - "3001:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - bss2-network
+    profiles:
+      - production
+
+networks:
+  bss2-network:
+    driver: bridge
