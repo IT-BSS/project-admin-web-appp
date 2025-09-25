@@ -1,5 +1,5 @@
 # Используем официальный Node.js образ
-FROM node:18-alpine
+FROM node:21
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
@@ -26,4 +26,4 @@ RUN pnpm run build
 EXPOSE 3000
 
 # Запускаем приложение
-CMD ["pnpm", "start"]
+CMD ["pnpm", "dev"]

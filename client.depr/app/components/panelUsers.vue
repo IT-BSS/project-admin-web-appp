@@ -62,7 +62,7 @@
 
 <script setup lang="ts">
 import { reactive, watch } from "vue";
-import { useUsersStore, type User } from "../../stores/users";
+import { useUsersStore, type User } from "../../../stores/users";
 
 const store = useUsersStore();
 const form = reactive<User>({ ...store.selectedUser! });
