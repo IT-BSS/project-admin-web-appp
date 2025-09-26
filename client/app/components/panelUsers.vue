@@ -21,7 +21,8 @@
       <h2>Данные пользователя</h2>
       <form @submit.prevent="saveUser">
         <label>
-          Фамилия:
+
+          ФИО:
           <input v-model="form.lastName" />
         </label>
         <label>
@@ -62,7 +63,9 @@
 
 <script setup lang="ts">
 import { reactive, watch } from "vue";
-import { useUsersStore, type User } from "../../../stores/users";
+
+import { useUsersStore, type User } from "../../stores/users";
+
 
 const store = useUsersStore();
 const form = reactive<User>({ ...store.selectedUser! });

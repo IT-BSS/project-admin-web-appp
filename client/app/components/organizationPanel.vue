@@ -1,7 +1,5 @@
 <template>
   <div class="panel">
-    <Sidebar />
-
     <div class="content">
       <h2>Организации</h2>
 
