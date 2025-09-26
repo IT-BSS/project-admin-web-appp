@@ -16,9 +16,6 @@ pnpm-lock.yaml
 /coverage/
 /logs
 *.log
-.env
-.env.local
-.env.*.local
 
 # --- Frontend (Vue 3) ---
 /frontend/node_modules/
