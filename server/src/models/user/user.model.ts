@@ -1,93 +1,72 @@
-import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../../db/db";
+import { Model, DataTypes, type Optional } from "sequelize";
+import sequelize from "../../db/db";
 
-export class User extends Model {
+interface UserAttributes {
+  id: number;
+  guid: string;
+  name: string;
+  surname: string;
+  middlename?: string | null;
+  login: string;
+  birthDate: string;
+  email: string;
+  phone: string;
+  passwordHash: string;
+  passportData?: string | null;
+  isBanned: boolean;
+  isManager: boolean;
+  isAdmin: boolean;
+  accessToken?: string | null;
+  refreshToken?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+type UserCreation = Optional<
+  UserAttributes,
+  "id" | "middlename" | "passportData" | "accessToken" | "refreshToken"
+>;
+
+export class User extends Model<UserAttributes, UserCreation>
+  implements UserAttributes {
   declare id: number;
   declare guid: string;
   declare name: string;
   declare surname: string;
-  declare middleName: string;
-  declare birthday: Date;
+  declare middlename?: string | null;
   declare login: string;
+  declare birthDate: string;
   declare email: string;
   declare phone: string;
   declare passwordHash: string;
-  declare passportData: string;
+  declare passportData?: string | null;
   declare isBanned: boolean;
-  declare accessToken: string;
-  declare refreshToken: string;
-  declare createdAt: Date;
-  declare updatedAt: Date;
-
-  toJSON() {
-    const values = { ...this.get() };
-    
-    delete values.id;
-    delete values.passwordHash;
-    delete values.passportData;
-
-    return values;
-  }
+  declare isManager: boolean;
+  declare isAdmin: boolean;
+  declare accessToken?: string | null;
+  declare refreshToken?: string | null;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
 }
 
 User.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    guid: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-        unique: true
-    },
-    name: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    surname: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    middlename: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    birthday: {
-        type: DataTypes.DATE,
-        allowNull: false
-    },
-    login: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-      unique: true
-    },
-    email: {
-      type: DataTypes.STRING(150),
-      allowNull: false,
-      unique: true,
-    },
-    phone: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    passwordHash: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    passportData: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    isBanned: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    guid: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, allowNull: false, unique: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    surname: { type: DataTypes.STRING, allowNull: false },
+    middlename: { type: DataTypes.STRING },
+    login: { type: DataTypes.STRING, allowNull: false, unique: true },
+    birthDate: { type: DataTypes.STRING, allowNull: false },
+    email: { type: DataTypes.STRING, allowNull: false, unique: true },
+    phone: { type: DataTypes.STRING },
+    passwordHash: { type: DataTypes.STRING, allowNull: false },
+    passportData: { type: DataTypes.TEXT },
+    isBanned: { type: DataTypes.BOOLEAN, defaultValue: false },
+    isManager: { type: DataTypes.BOOLEAN, defaultValue: false },
+    isAdmin: { type: DataTypes.BOOLEAN, defaultValue: false },
+    accessToken: { type: DataTypes.TEXT },
+    refreshToken: { type: DataTypes.TEXT },
   },
-  {
-    sequelize,
-    tableName: "users",
-    timestamps: true, // createdAt, updatedAt
-  }
+  { sequelize, tableName: "Users", timestamps: true }
 );

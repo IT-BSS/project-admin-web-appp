@@ -1,59 +1,40 @@
-import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../../db/db";
+import { Model, DataTypes } from "sequelize";
+import sequelize from "../../db/db";
 
-export class Organization extends Model {
+interface OrganizationAttributes {
+  id: number;
+  guid: string;
+  name: string;
+  description?: string | null;
+  address?: string | null;
+  inn: string;
+  kpp: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export class Organization extends Model<OrganizationAttributes>
+  implements OrganizationAttributes {
   declare id: number;
   declare guid: string;
   declare name: string;
-  declare description: string;
-  declare email: string;
-  declare phone: string;
-  declare isArchived: boolean;
-  declare createdAt: Date;
-  declare updatedAt: Date;
+  declare description?: string | null;
+  declare address?: string | null;
+  declare inn: string;
+  declare kpp: string;
+  declare readonly createdAt: Date;
+  declare readonly updatedAt: Date;
 }
 
 Organization.init(
   {
-    id: {
-      type: DataTypes.INTEGER,
-      autoIncrement: true,
-      primaryKey: true,
-    },
-    guid: {
-        type: DataTypes.STRING(100),
-        allowNull: false,
-        unique: true
-    },
-    name: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    address: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING(150),
-      allowNull: false,
-      unique: true,
-    },
-    phone: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    isArchived: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-    },
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    guid: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, allowNull: false, unique: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    description: { type: DataTypes.TEXT },
+    address: { type: DataTypes.STRING },
+    inn: { type: DataTypes.STRING, allowNull: false },
+    kpp: { type: DataTypes.STRING, allowNull: false },
   },
-  {
-    sequelize,
-    tableName: "organizations",
-    timestamps: true, // createdAt, updatedAt
-  }
+  { sequelize, tableName: "Organizations", timestamps: true }
 );

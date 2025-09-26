@@ -2,12 +2,17 @@ import express, { Router } from "express"
 
 import * as manageUsersController from '../../../controllers/admin/manageUsers.controller' 
 
-const { asyncHandler } = require('../../middlewares/asyncHandler');
-const { signup: signupValidator, signin: signinValidator } = require('../../validators/auth/auth');
+import { asyncHandler } from '../../../middleware/asyncHandler'
 
 const router: Router = express.Router();
 
 router.route('/get_user')
-    .post(asyncHandler(manageUsersController.getUser));
+    .get(asyncHandler(manageUsersController.getUser));
 
+router.route('/get_all_users')
+    .get(asyncHandler(manageUsersController.getAllUsers));
+
+router.route('/edit_user')
+    .post(asyncHandler(manageUsersController.editUser));
+    
 export { router as adminUserRouter };

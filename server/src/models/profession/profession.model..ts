@@ -1,23 +1,26 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "../../db/db";
 
-interface RoleAttributes {
+interface ProfessionAttributes {
   id: number;
   guid: string;
   name: string;
+  description?: string | null;
 }
 
-export class Role extends Model<RoleAttributes> implements RoleAttributes {
+export class Profession extends Model<ProfessionAttributes> implements ProfessionAttributes {
   declare id: number;
   declare guid: string;
   declare name: string;
+  declare description?: string | null;
 }
 
-Role.init(
+Profession.init(
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     guid: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, allowNull: false, unique: true },
     name: { type: DataTypes.STRING, allowNull: false },
+    description: { type: DataTypes.TEXT },
   },
-  { sequelize, tableName: "Roles", timestamps: true }
+  { sequelize, tableName: "Professions", timestamps: true }
 );

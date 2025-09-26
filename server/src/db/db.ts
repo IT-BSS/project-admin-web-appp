@@ -1,9 +1,9 @@
 import { Sequelize } from "sequelize";
 
-export const sequelize = new Sequelize(
-  "my_database",   
-  "my_user",     
-  "my_password",   
+const sequelize = new Sequelize(
+  "webapp",   
+  "postgres",     
+  "admin",   
   {
     host: "localhost",
     port: 5432,
@@ -20,3 +20,5 @@ export const sequelize = new Sequelize(
     console.error("Couldn't connect to database:", error);
   }
 })();
+
+export default sequelize;
