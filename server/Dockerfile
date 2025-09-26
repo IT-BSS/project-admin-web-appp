@@ -1,29 +1,29 @@
 # Используем официальный Node.js образ
-FROM node:18-alpine
+FROM node:21
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
-# Копируем package.json и pnpm-lock.yaml
-COPY package.json pnpm-lock.yaml ./
+# Копируем package.json (и package-lock.json / yarn.lock, если есть) — но не pnpm-lock.yaml
+COPY package.json ./
 
-# Устанавливаем pnpm
+# Устанавливаем pnpm глобально
 RUN npm install -g pnpm
 
-# Устанавливаем зависимости
-RUN pnpm install --frozen-lockfile
+# Устанавливаем зависимости (без frozen-lockfile)
+RUN pnpm install
 
-# Копируем исходный код
+# Копируем весь остальной код в контейнер
 COPY . .
 
-# Создаем папку для логов
+# Создаем папку для логов (если нужна)
 RUN mkdir -p logs
 
-# Компилируем TypeScript
+# Запускаем сборку
 RUN pnpm run build
 
-# Открываем порт
+# Открываем порт (сервер слушает на 3000)
 EXPOSE 3000
 
-# Запускаем приложение
-CMD ["pnpm", "start"]
+# Запуск приложения — здесь “dev”, можно поменять на “start” или др. команду
+CMD ["pnpm", "dev"]
