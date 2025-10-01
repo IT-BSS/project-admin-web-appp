@@ -6,6 +6,7 @@
         <p class="auth-form__subtitle">Добро пожаловать! Войдите в свой аккаунт</p>
       </div>
 
+
       <form class="auth-form__form" @submit.prevent="onSubmit">
         <div class="input-group">
           <label class="input-group__label" for="login">Логин или Email</label>
@@ -48,6 +49,7 @@
       <div class="auth-form__footer">
         <p class="auth-form__switch-text">
           Нет аккаунта?
+
           <nuxt-link to="/register" class="auth-form__switch-link">Зарегистрироваться</nuxt-link>
         </p>
       </div>
@@ -56,6 +58,7 @@
 </template>
 
 <script setup lang="ts">
+
 import {ref} from "vue";
 import { useAuth } from "~~/composables/useAuth";
 import {useAuthStore} from "~~/stores/auth";
@@ -94,7 +97,6 @@ const onSubmit = async () => {
     alert('Бро ошибка какая-то: ' + (e.message || 'Неизвестная ошибка'));
   }
 }
-
 </script>
 
 <style scoped lang="scss">

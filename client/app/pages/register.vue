@@ -6,6 +6,7 @@
         <p class="auth-form__subtitle">Присоединяйтесь к нашему сообществу</p>
       </div>
 
+
       <form class="auth-form__form" @submit.prevent="onSubmit">
         <div class="input-group">
           <label class="input-group__label" for="fullName">ФИО</label>
@@ -52,6 +53,7 @@
 </template>
 
 <script setup lang="ts">
+
 import { ref } from "vue";
 import { useAuth } from "~~/composables/useAuth";
 import {useAuthStore} from "~~/stores/auth";

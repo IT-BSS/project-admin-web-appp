@@ -1,3 +1,4 @@
+
 import express, { Application, Request, Response, NextFunction } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -97,9 +98,6 @@ async function startServer() {
   });
 }
 
-startServer().catch((err) => {
-  console.error("Ошибка при запуске приложения:", err);
-  process.exit(1);
-});
+app.use(errorHandler);
 
 export default app;
