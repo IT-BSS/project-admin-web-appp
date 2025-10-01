@@ -1,70 +1,88 @@
 import { defineStore } from 'pinia'
-import {useCookie} from "nuxt/app";
-import * as axios from "axios";
 
-// intefrace from users
-interface User
-{
-    id: number,
-    email: string,
-    role: string
+interface User {
+    guid: string
+    fio: string
+    birth_date: string
+    email: string
+    phone: string
+    created_at: string
+    updated_at: string
 }
 
-// interface from auth state manager
-// save user date and token
-interface authState
-{
-    toker: string | null,
-    user: User | null,
+interface AuthState {
+    accessToken: string | null
+    refreshToken: string | null
+    user: User | null
 }
 
 export const useAuthStore = defineStore('auth', {
-    // default value = null, but me save new value
-    state: authState => ({
-        token: null,
+    state: (): AuthState => ({
+        accessToken: null,
+        refreshToken: null,
         user: null,
     }),
 
+    getters: {
+        isAuthenticated: (state) => !!state.accessToken,
+    },
+
     actions: {
-        setToken(token:string)
-        {
-            this.toker = token;
-            const tokenCookie = useCookie<string | null> ('auth_token', {sameSite: 'strict'});
-            tokenCookie.value = token;
+        // ✅ Сохраняем оба токена
+        setTokens(accessToken: string) {
+            this.accessToken = accessToken
+
+            const accessTokenCookie = useCookie<string>('access_token', {
+                maxAge: 60 * 60 * 24, // 1 день
+                sameSite: 'strict',
+                secure: process.env.NODE_ENV === 'production',
+                path: '/'
+            })
+            accessTokenCookie.value = accessToken
         },
 
-        loadToken()
-        {
-            const tokenCookie = useCookie<string | null>('auth_token');
-            this.token = tokenCookie.value;
+        // For future methods (function poxyi)
+        setUser(user: User) {
+            this.user = user
         },
 
-        async fetchUser()
-        {
-            if (!this.token) return;
-            try
-            {
-                const response = await $axios.get<User>('/api/auth');
-                this.user = response.data;
+        loadTokens() {
+            const accessTokenCookie = useCookie<string | null>('access_token')
+
+            if (accessTokenCookie.value) {
+                this.accessToken = accessTokenCookie.value
             }
-            catch (error)
-            {
-                this.logout();
+        },
+
+        async fetchUser() {
+            if (!this.accessToken) return
+
+            try {
+                const { data, error } = await useFetch('/api/auth/me', {
+                    headers: {
+                        Authorization: `Bearer ${this.accessToken}`
+                    }
+                })
+
+                if (error.value) {
+                    throw error.value
+                }
+
+                this.user = data.value
+            } catch (error) {
+                console.error('Ошибка получения пользователя:', error)
+                this.logout()
             }
         },
 
-        logout()
-        {
-            this.token = null;
-            this.user = null;
-            const tokenCookie = useCookie<string | null>('auth_token');
-            tokenCookie.value = null;
-        },
+        logout() {
+            this.accessToken = null
+            this.refreshToken = null
+            this.user = null
 
-        get isAdmin(): boolean
-        {
-            return this.user?.role == 'Manager';
+            const accessTokenCookie = useCookie<string | null>('access_token')
+
+            accessTokenCookie.value = null
         }
     }
 })
-

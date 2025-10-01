@@ -1,11 +1,13 @@
 import express, { Application, Request, Response, NextFunction } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import logger from "./middleware/logger";
-import helloRouter from "./router/helloRouter";
+import logger from "./middleware/logger.js";
+import helloRouter from "./router/helloRouter.js";
+import authRoutes from "./router/auth/authRoutes.js";
 
-import { connectDB, query } from "./database"; // импортируем нашу обёртку
-import usersRouter from "./router/users/usersRouter";
+import { connectDB, query } from "./database/index.js"; // импортируем нашу обёртку
+import usersRouter from "./router/users/usersRouter.js";
 dotenv.config();
 
 const app: Application = express();
@@ -18,6 +20,8 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
+
+app.use(cookieParser());
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
@@ -55,6 +59,10 @@ app.get("/health", (req, res) => {
   });
 });
 
+//  --------------------------
+app.use("/api/users", usersRouter);
+app.use("/api/auth", authRoutes);
+
 app.use("*", (req, res) => {
   logger.warn(`404 - Route not found: ${req.method} ${req.originalUrl}`);
   res.status(404).json({
@@ -78,14 +86,11 @@ app.use((error: Error, req: Request, res: Response, next: any) => {
   });
 });
 
-//  --------------------------
-app.use("/api/users", usersRouter);
-
-
 async function startServer() {
   await connectDB();
 
   app.listen(PORT, () => {
+    logger.info(`TEST TEST TEST TEST `)
     logger.info(`Server is running on port ${PORT}`);
     logger.info(`Health check: http://localhost:${PORT}/health`);
     logger.info(`Environment: ${process.env.NODE_ENV || "development"}`);

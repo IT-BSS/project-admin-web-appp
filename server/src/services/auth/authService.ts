@@ -1,78 +1,118 @@
-import jwt from 'jsonwebtoken'
-import {JWT_SECRET, JWT_EXPIRATION} from '../../config';
-import bcrypt from "bcryptjs";
-import { query } from "../../database";
-import { randomUUID } from "crypto";
+// src/services/authService.ts
+import bcrypt from "bcrypt";
+import { v4 as uuidv4 } from "uuid";
+import {
+  createUser,
+  getUserByEmail,
+  saveRefreshToken,
+  getUserByRefreshToken,
+  deleteRefreshToken,
+  getUserByGuid,
+} from "../../repositories/userRepository.js";
+import {
+  RegisterUserDTO,
+  LoginUserDTO,
+  UserResponse,
+  AuthTokens,
+} from "../../models/auth/userModel.js";
+import {
+  signAccessToken,
+  signRefreshToken,
+  verifyRefreshToken
+} from "../../utils/jwt.js";
 
-export const registerUser = async (fio: string, birth_date: Date, email: string, phone: string, password: string) =>
-{
-    const salt = bcrypt.genSaltSync(10);
-    const passwordHash = bcrypt.hashSync(password, salt);
-    const guid = randomUUID();
-    const created_at = new Date().toISOString();
-    const updated_at = created_at;
+const SALT_ROUNDS = 12;
 
-    const insertQuery = `
-        INSERT INTO users (guid, fio, birth_date, email, phone, password_hash, salt_password, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        RETURNING *
-    `;
+const register = async (dto: any) => {
+  const existing = await getUserByEmail(dto.email);
+  if (existing) throw new Error("Email already in use");
 
-    const values = [guid, fio, birth_date, email, phone, passwordHash, salt, created_at, updated_at];
+  const guid = uuidv4();
+  const salt = await bcrypt.genSalt(SALT_ROUNDS);
+  const hash = await bcrypt.hash(dto.password, salt);
 
-    try {
-        const result = await query(insertQuery, values);
-        return result.rows[0];
-    } catch (error) {
-        throw new Error("Error registering user: " + (error instanceof Error ? error.message : String(error)));
-    }
-}
+  const user = await createUser({
+    guid,
+    fio: dto.fio,
+    birth_date: dto.birth_date,
+    email: dto.email,
+    phone: dto.phone,
+    password_hash: hash,
+    salt_password: salt,
+  });
 
-export const loginUser = async (email: string, password: string)=>
-{
-    //find user from database
-    const result = await query("SELECT * FROM users WHERE email = $1", [email]);
-    const user = result.rows[0];
+  return user;
+};
 
-    if (!user)
-    {
-        throw new Error("User not found");
-    }
+const login = async (dto: any) => {
+  const user = await getUserByEmail(dto.email);
+  if (!user) throw new Error("Invalid credentials");
 
-    // check valid password
-    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
+  const ok = await bcrypt.compare(dto.password, user.password_hash);
+  if (!ok) throw new Error("Invalid credentials");
 
-    if (!isPasswordValid)
-    {
-        throw new Error('Invalid password');
-    }
+  const payload = { guid: user.guid, email: user.email };
+  const accessToken = signAccessToken(payload);
+  const refreshToken = signRefreshToken(payload);
 
-    // generate token with login
-    const accessToken = jwt.sign({ userId: user.guid }, JWT_SECRET, { expiresIn: '1h' });
-    const refreshToken = jwt.sign({ userId: user.guid }, JWT_SECRET, { expiresIn: '1d' });
+  await saveRefreshToken(user.guid, refreshToken);
 
-    // update refresh_token from database
-    await query("UPDATE users SET refresh_token = $1 WHERE guid = $2", [refreshToken, user.guid]);
+  const userResp = {
+    guid: user.guid,
+    fio: user.fio,
+    birth_date: user.birth_date,
+    email: user.email,
+    phone: user.phone,
+    created_at: user.created_at,
+    updated_at: user.updated_at,
+  };
 
-    return {accessToken, refreshToken};
-}
+  return { user: userResp, tokens: { accessToken, refreshToken } };
+};
 
-// this function future, for update password
-export const updatePassword = async (guid: string, newPassword: string) =>
-{
-    const salt = bcrypt.genSaltSync(10);
-    const newPasswordHash = bcrypt.hashSync(newPassword, salt);
+const refreshTokens = async (refreshToken: any) => {
+  try {
+    const decoded = verifyRefreshToken(refreshToken);
+    if (typeof decoded === 'string' || !decoded?.guid) throw new Error("Invalid token payload");
 
-    const result = await query("SELECT * FROM users WHERE guid = $1", [guid]);
-    const user = result.rows[0];
-    
-    if (!user)
-    {
-        throw new Error("User not found");
-    }
+    // ensure token exists in DB
+    const user = await getUserByRefreshToken(refreshToken);
+    if (!user || user.guid !== decoded.guid) throw new Error("Invalid refresh token");
 
-    await query(
-        "UPDATE users SET password_hash = $1, salt_password = $2 WHERE guid = $3",
-        [newPasswordHash, salt, guid]
-    );
-}
+    const payload = { guid: user.guid, email: user.email };
+    const newAccess = signAccessToken(payload);
+    const newRefresh = signRefreshToken(payload);
+
+    await saveRefreshToken(user.guid, newRefresh);
+
+    return { accessToken: newAccess, refreshToken: newRefresh };
+  } catch (err) {
+    throw new Error("Invalid refresh token");
+  }
+};
+
+const logout = async (guid: any) => {
+  await deleteRefreshToken(guid);
+};
+
+const getProfile = async (guid: any) => {
+  const user = await getUserByGuid(guid);
+  if (!user) return null;
+  return {
+    guid: user.guid,
+    fio: user.fio,
+    birth_date: user.birth_date,
+    email: user.email,
+    phone: user.phone,
+    created_at: user.created_at,
+    updated_at: user.updated_at,
+  };
+};
+
+export {
+  register,
+  login,
+  refreshTokens,
+  logout,
+  getProfile
+};

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import logger from '../middleware/logger';
+import logger from '../middleware/logger.js';
 
 // get hello endpoint
 export const getHello = (req: Request, res: Response): void => {
