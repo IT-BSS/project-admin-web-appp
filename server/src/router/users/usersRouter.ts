@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from "express";
-import { query } from "../../database";
+import { query } from "../../database/index.js";
 import bcrypt from "bcrypt";
 import { randomUUID } from "crypto";
 

@@ -5,30 +5,33 @@
         <h1 class="auth-form__title">Вход в аккаунт</h1>
         <p class="auth-form__subtitle">Добро пожаловать! Войдите в свой аккаунт</p>
       </div>
-      
-      <form class="auth-form__form">
+
+
+      <form class="auth-form__form" @submit.prevent="onSubmit">
         <div class="input-group">
           <label class="input-group__label" for="login">Логин или Email</label>
-          <input 
-            id="login"
-            type="text" 
-            class="input-group__input" 
-            placeholder="Введите логин или email"
-            autocomplete="username"
+          <input
+              v-model="email"
+              id="login"
+              type="text"
+              class="input-group__input"
+              placeholder="Введите логин или email"
+              autocomplete="username"
           >
         </div>
-        
+
         <div class="input-group">
           <label class="input-group__label" for="password">Пароль</label>
-          <input 
-            id="password"
-            type="password" 
-            class="input-group__input" 
-            placeholder="Введите пароль"
-            autocomplete="current-password"
+          <input
+              v-model="password"
+              id="password"
+              type="password"
+              class="input-group__input"
+              placeholder="Введите пароль"
+              autocomplete="current-password"
           >
         </div>
-        
+
         <div class="auth-form__options">
           <label class="checkbox">
             <input type="checkbox" class="checkbox__input">
@@ -37,15 +40,16 @@
           </label>
           <a href="#" class="auth-form__forgot-link">Забыли пароль?</a>
         </div>
-        
-        <button type="submit" class="btn btn--primary btn--full-width">
+
+        <button class="btn btn--primary btn--full-width" type="submit">
           Войти в аккаунт
         </button>
       </form>
-      
+
       <div class="auth-form__footer">
         <p class="auth-form__switch-text">
-          Нет аккаунта? 
+          Нет аккаунта?
+
           <nuxt-link to="/register" class="auth-form__switch-link">Зарегистрироваться</nuxt-link>
         </p>
       </div>
@@ -54,7 +58,45 @@
 </template>
 
 <script setup lang="ts">
-// TODO: Link everything to the backend when it's ready
+
+import {ref} from "vue";
+import { useAuth } from "~~/composables/useAuth";
+import {useAuthStore} from "~~/stores/auth";
+
+const authStore = useAuthStore()
+const {loginUser} = useAuth();
+
+const email = ref('');
+const password = ref('');
+
+const onSubmit = async () => {
+  if (!email.value || !password.value) {
+    alert('Бро ты пьяный? Поля все заполни');
+    return;
+  }
+
+  try {
+    const dto = {
+      email: email.value,
+      password: password.value,
+    };
+
+    const res = await loginUser(dto);
+
+    if (res.tokens?.accessToken) {
+      authStore.setTokens(res.tokens.accessToken)
+      await authStore.fetchUser();
+
+      console.log("Вход успешный:", res);
+      alert("Бро, ты вошел");
+    } else {
+      alert('Токен не получен');
+    }
+  } catch (e) {
+    console.error('Ошибка входа:', e);
+    alert('Бро ошибка какая-то: ' + (e.message || 'Неизвестная ошибка'));
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -290,7 +332,7 @@
 @media (max-width: 480px) {
   .auth-form {
     margin: 10px;
-    
+
     &__header {
       padding: 32px 24px 20px;
     }

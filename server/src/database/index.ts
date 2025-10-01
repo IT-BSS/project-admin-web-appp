@@ -4,7 +4,7 @@
 import { Pool } from "pg";
 
 const pool = new Pool({
-    host: "postgres",        // имя хоста (в Docker-сети или localhost, в зависимости от среды)
+    host: "postgres",
     port: 5432,
     database: "bss_database",
     user: "bss_user",
@@ -13,16 +13,13 @@ const pool = new Pool({
 
 export const connectDB = async () => {
     try {
-        // Проверим соединение (выполнив простой запрос)
         await pool.query("SELECT 1");
         console.log("✅ Успешное подключение к Postgres (через pg)");
     } catch (error) {
         console.error("❌ Ошибка подключения к Postgres:", error);
-        throw error;
     }
 };
 
-// Функция для получения клиента / выполнения запросов
 export const query = (text: string, params?: any[]) => {
     return pool.query(text, params);
 };

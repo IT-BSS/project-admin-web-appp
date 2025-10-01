@@ -1,63 +1,101 @@
-import express, { type ErrorRequestHandler, type NextFunction } from 'express';
-import type { Express } from 'express';
-import morgan from 'morgan';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import bodyParser from 'body-parser';
-import { adminUserRouter } from './routes/admin/user/adminUserRoute';
-//import { httpLogStream } from './deprecated/utils/logger';
 
-const app: Express = express();
+import express, { Application, Request, Response, NextFunction } from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+import logger from "./middleware/logger.js";
+import helloRouter from "./router/helloRouter.js";
+import authRoutes from "./router/auth/authRoutes.js";
 
-/*import { adminUserRouter } from "./routes/admin/user/adminUserRoute"
-const userRoute = require('./routes/auth/user.route')
-*/
+import { connectDB, query } from "./database/index.js"; // импортируем нашу обёртку
+import usersRouter from "./router/users/usersRouter.js";
+dotenv.config();
 
-// Позволяет запросам с использованием куков отправлять куки обратно на сервер
-app.use(cors({ 
-    origin: 'http://localhost:3000',
-    credentials: true, // Разрешаем отправку куки на клиенте
-}));
+const app: Application = express();
+const PORT = process.env.PORT || 3000;
+app.use(
+  cors({
+    origin: ["http://localhost:8080", "http://127.0.0.1:8080", "http://0.0.0.0:8080"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  })
+);
 
 app.use(cookieParser());
 
-app.use(morgan('dev'));
-//app.use(morgan('combined', { stream: httpLogStream }));
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.path}`, {
+    ip: req.ip,
+    userAgent: req.get("User-Agent"),
+    timestamp: new Date().toISOString(),
+  });
+  next();
+});
 
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use("/api/hello", helloRouter);
 
-app.use("/api", adminUserRouter);
-/*
-app.use('/api', reviews, GetProductFilters)
-app.use('/api', product, catalogRoutes, productsAbout) // Вот тут роут для получение карточек а так же для - каталога и фильтра, а так же пагинации и т.п
-app.use('/api/auth', authRoute, userRoute);
-app.use('/api/auth/refresh', refreshRoute); // Используем маршрут для обновления токена
+// Пример маршрута, который использует `query` для получения данных
+app.get(
+  "/api/users",
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const result = await query("SELECT * FROM users"); // SQL-запрос
+      res.json(result.rows);
+    } catch (err) {
+      next(err);
+    }
+  }
+);
 
-*/
-// app.use('/api/order/', payment, order);
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || "development",
+  });
+});
 
-/* deprecated
+//  --------------------------
+app.use("/api/users", usersRouter);
+app.use("/api/auth", authRoutes);
 
-// Подключаем errorHandler
+app.use("*", (req, res) => {
+  logger.warn(`404 - Route not found: ${req.method} ${req.originalUrl}`);
+  res.status(404).json({
+    success: false,
+    message: "Route not found",
+    path: req.originalUrl,
+  });
+});
 
-import errorHandler from './deprecated/middlewares/auth/errorHandler';
+app.use((error: Error, req: Request, res: Response, next: any) => {
+  logger.error("Unhandled error", {
+    error: error.message,
+    stack: error.stack,
+    path: req.path,
+    method: req.method,
+  });
 
-// Используем errorHandler для обработки ошибок
-app.use(errorHandler.handleTokenExpiredError);
-app.use(errorHandler.handleInvalidTokenError);
-app.use(errorHandler.handleDatabaseError);
-*/
+  res.status(500).json({
+    success: false,
+    message: "Internal server error",
+  });
+});
 
-const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    res.status(err.statusCode || 500).send({
-        status: "error",
-        message: err.message
-    });
-    next();
+async function startServer() {
+  await connectDB();
+
+  app.listen(PORT, () => {
+    logger.info(`TEST TEST TEST TEST `)
+    logger.info(`Server is running on port ${PORT}`);
+    logger.info(`Health check: http://localhost:${PORT}/health`);
+    logger.info(`Environment: ${process.env.NODE_ENV || "development"}`);
+  });
 }
 
 app.use(errorHandler);
