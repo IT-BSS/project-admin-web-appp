@@ -89,7 +89,7 @@ const onSubmit = async () => {
     } else {
       alert('Токен не получен');
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error('Ошибка входа:', e);
     alert('Бро ошибка какая-то: ' + (e.message || 'Неизвестная ошибка'));
   }
@@ -330,7 +330,6 @@ const onSubmit = async () => {
 @media (max-width: 480px) {
   .auth-form {
     margin: 10px;
-
     &__header {
       padding: 32px 24px 20px;
     }

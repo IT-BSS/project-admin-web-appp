@@ -1,4 +1,6 @@
-// src/models/auth/userModels.ts
+// юзер у нас один - models/user/user.model.ts; то, что ниже, под корректную модель не подходит
+
+/*
 export interface User {
   guid: string;
   fio: string;
@@ -29,6 +31,9 @@ export interface RegisterUserDTO {
   phone: string;
   password: string;
 }
+*/
+
+// то, что дальше, под пиво пойдёт (есть соответствие с корректной моделью)
 
 export interface LoginUserDTO {
   email: string;
