@@ -8,7 +8,6 @@ export interface GetUserQuery {
   id?: number;
 }
 
-
 export interface AddUserBody {
   name: string,
   surname: string,
@@ -21,3 +20,7 @@ export interface AddUserBody {
   passportData: string
 }
 
+export interface BanUserBody
+{
+  id: string;
+}

@@ -1,5 +1,6 @@
 import { Model, DataTypes, type Optional } from "sequelize";
 import sequelize from "../../db/db";
+import { access } from "fs";
 
 interface UserAttributes {
   id: number;
@@ -22,12 +23,11 @@ interface UserAttributes {
   updatedAt?: Date;
 }
 
-type UserCreation = Optional<
-  UserAttributes,
+type RealUserAttributes = Optional<UserAttributes,
   "id" | "middlename" | "passportData" | "accessToken" | "refreshToken"
 >;
 
-export class User extends Model<UserAttributes, UserCreation>
+export class User extends Model<RealUserAttributes>
   implements UserAttributes {
   declare id: number;
   declare guid: string;
@@ -47,6 +47,17 @@ export class User extends Model<UserAttributes, UserCreation>
   declare refreshToken?: string | null;
   declare readonly createdAt: Date;
   declare readonly updatedAt: Date;
+
+  toJSON(): any {
+      let values = { ...this.get({ plain: true }) } as any;
+
+      delete values.id;
+      delete values.passwordHash;
+      delete values.accessToken;
+      delete values.refreshToken;
+       
+      return values;
+  }
 }
 
 User.init(

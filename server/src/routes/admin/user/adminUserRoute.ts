@@ -14,5 +14,8 @@ router.route('/get_all_users')
 
 router.route('/edit_user')
     .post(asyncHandler(manageUsersController.editUser));
+
+router.route('/ban_user')
+    .post(asyncHandler(manageUsersController.banUser));
     
 export { router as adminUserRouter };
