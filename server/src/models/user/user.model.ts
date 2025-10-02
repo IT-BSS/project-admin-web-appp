@@ -24,7 +24,7 @@ interface UserAttributes {
 }
 
 type RealUserAttributes = Optional<UserAttributes,
-  "id" | "middlename" | "passportData" | "accessToken" | "refreshToken"
+  "id" | "guid" | "middlename" | "passportData" | "accessToken" | "refreshToken"
 >;
 
 export class User extends Model<RealUserAttributes>

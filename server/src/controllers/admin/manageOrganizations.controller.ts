@@ -59,7 +59,6 @@ export async function addOrganization(req: Request<{}, {}, AddOrganizationBody, 
         if (!kpp)           return res.status(400).json({ error: "Необходим КПП организации." });
 
         let organization: Organization = await Organization.create({
-            
             name,
             description,
             address,
@@ -68,6 +67,8 @@ export async function addOrganization(req: Request<{}, {}, AddOrganizationBody, 
             inn,
             kpp
         });
+
+        res.status(200).json({ id: organization.guid });
     } catch (error: any) {
         console.error("Ошибка при обработке запроса на добавление организации: ", error);
         res.status(500).json({ error: "Сервер недоступен." });

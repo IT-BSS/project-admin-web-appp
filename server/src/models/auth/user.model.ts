@@ -1,4 +1,6 @@
-export interface User {
+// юзер у нас один - models/user/user.model.ts
+
+/*export interface User {
     guid: string;
     fio: string;
     birth_date: Date;
@@ -9,3 +11,4 @@ export interface User {
     refresh_token: string;
     access_token: string;
 }
+*/

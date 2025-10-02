@@ -96,7 +96,9 @@ export async function addUser(req: Request<{}, {}, AddUserBody, {}>, res: Respon
         email, login, phone, 
         password, 
         passportData } = req.body;
-
+        console.log("NAME: ", name);
+        console.log("LOGIN: ", login);
+        
         if (!name)          return res.status(400).json({ error: "Необходимо имя пользователя." });
         if (!surname)       return res.status(400).json({ error: "Необходима фамилия пользователя." });
         if (!middlename)    return res.status(400).json({ error: "Необходимо отчество пользователя." });
@@ -109,9 +111,7 @@ export async function addUser(req: Request<{}, {}, AddUserBody, {}>, res: Respon
 
         let passwordHash = password; // TODO TOP PRIORITY - implement hash function
         let isBanned = false, isManager = false, isAdmin = false;
-        let guid = "0";
         let user: User = await User.create({
-          guid,
           name, surname, middlename, 
           birthDate, 
           email, login, phone, 
@@ -121,11 +121,9 @@ export async function addUser(req: Request<{}, {}, AddUserBody, {}>, res: Respon
           isManager,
           isAdmin,
         });
-      
-        user.guid = user.id.toString(); // TODO PRE-TOP PRIORITY - implement correct GUID creation
-        user.save();
-
-        res.json({ success: true, id: user.guid });
+        
+        console.log("New user with GUID: ", user.guid);
+        res.status(200).json({ id: user.guid });
 
   } catch(error: any) {
       console.error("Ошибка при обработке запроса на добавление пользователя: ", error);

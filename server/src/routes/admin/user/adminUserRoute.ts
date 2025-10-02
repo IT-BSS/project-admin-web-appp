@@ -4,6 +4,8 @@ import * as manageUsersController from '../../../controllers/admin/manageUsers.c
 
 import { asyncHandler } from '../../../middleware/asyncHandler'
 
+import upload from "../../../middleware/upload";
+
 const router: Router = express.Router();
 
 router.route('/get_user')
@@ -12,6 +14,8 @@ router.route('/get_user')
 router.route('/get_all_users')
     .get(asyncHandler(manageUsersController.getAllUsers));
 
+router.route('/add_user')
+    .post(upload.none(), asyncHandler(manageUsersController.addUser));
 router.route('/edit_user')
     .post(asyncHandler(manageUsersController.editUser));
 
