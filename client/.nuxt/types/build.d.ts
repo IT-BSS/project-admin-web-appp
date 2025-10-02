@@ -14,7 +14,7 @@ declare module "#build/plugins.server.mjs";
 declare module "#build/test-component-wrapper.mjs";
 declare module "#build/image-options.mjs";
 declare module "#build/devtools/settings.mjs";
-declare module "#build/runtime.vue-devtools-client.62KqGQZWoTJ0JjIN1XW4yJbqhiX_JR1rbHDezhfoGwo.js";
+declare module "#build/runtime.vue-devtools-client._aDZMWzpIH_28thbafGS5PLvgcfRKb02P8_lqgCXs_Q.js";
 declare module "#build/routes.mjs";
 declare module "#build/pages.mjs";
 declare module "#build/router.options.mjs";

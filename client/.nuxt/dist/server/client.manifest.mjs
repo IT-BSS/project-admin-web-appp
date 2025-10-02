@@ -7,12 +7,12 @@ export default {
     "module": true,
     "resourceType": "script"
   },
-  "C:/Users/admin/Desktop/bss2/project-admin-web-appp/client/node_modules/nuxt/dist/app/entry.async.js": {
+  "D:/weaboo/chikunox-adminka/web-app-v.0.5/project-admin-web-appp/client/node_modules/nuxt/dist/app/entry.async.js": {
     "resourceType": "script",
     "module": true,
     "prefetch": true,
     "preload": true,
     "isEntry": true,
-    "file": "C:/Users/admin/Desktop/bss2/project-admin-web-appp/client/node_modules/nuxt/dist/app/entry.async.js"
+    "file": "D:/weaboo/chikunox-adminka/web-app-v.0.5/project-admin-web-appp/client/node_modules/nuxt/dist/app/entry.async.js"
   }
 }

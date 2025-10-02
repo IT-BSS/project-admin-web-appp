@@ -13,7 +13,9 @@ router.get(
   "/",
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const result = await query("SELECT * FROM users ORDER BY id");
+      const result = await query(
+        "SELECT * FROM users ORDER BY created_at DESC"
+      );
       res.json(result.rows);
       return;
     } catch (err) {
@@ -24,21 +26,21 @@ router.get(
 );
 
 /**
- * GET /api/users/:id
+ * GET /api/users/:guid
  */
 router.get(
-  "/:id",
+  "/:guid",
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const id = Number(req.params.id);
-      if (Number.isNaN(id)) {
-        res.status(400).json({ message: "Invalid id" });
+      const guid = req.params.guid;
+      if (!guid) {
+        res.status(400).json({ message: "Invalid guid" });
         return;
       }
 
-      const result = await query("SELECT * FROM users WHERE id = $1", [id]);
+      const result = await query("SELECT * FROM users WHERE guid = $1", [guid]);
       if (!result.rows.length) {
-        res.status(404).json({ message: "Not found" });
+        res.status(404).json({ message: "User not found" });
         return;
       }
       res.json(result.rows[0]);
@@ -57,54 +59,53 @@ router.post(
   "/",
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const {
-        fio,
-        birth_date,
-        email,
-        phone,
-        password,
-        passport_data,
-        is_in_db = false,
-        is_manager = false,
-        is_admin = false,
-      } = req.body;
+      const { fio, birth_date, email, phone, password } = req.body;
 
-      const guid = randomUUID();
-
-      const created_at = new Date().toISOString();
-      const updated_at = created_at;
-
-      let password_hash: string | null = null;
-      if (password) {
-        password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+      // Проверка обязательных полей
+      if (!fio || !email || !password) {
+        res.status(400).json({
+          message: "Missing required fields: fio, email, password",
+        });
+        return;
       }
 
+      const guid = randomUUID();
+      const salt_password = randomUUID(); // Генерируем соль
+
+      // Хешируем пароль с солью
+      const password_hash = await bcrypt.hash(
+        password + salt_password,
+        SALT_ROUNDS
+      );
+
       const insertQuery = `
-      INSERT INTO users
-      (guid, fio, birth_date, email, phone, password_hash, passport_data, is_in_db, is_manager, is_admin, created_at, updated_at)
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
-      RETURNING *;
-    `;
+        INSERT INTO users 
+        (guid, fio, birth_date, email, phone, password_hash, salt_password, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
+        RETURNING guid, fio, birth_date, email, phone, created_at, updated_at;
+      `;
 
       const values = [
         guid,
-        fio || null,
+        fio,
         birth_date || null,
-        email || null,
+        email,
         phone || null,
         password_hash,
-        passport_data || null,
-        is_in_db,
-        is_manager,
-        is_admin,
-        created_at,
-        updated_at,
+        salt_password,
       ];
 
       const result = await query(insertQuery, values);
       res.status(201).json(result.rows[0]);
       return;
-    } catch (err) {
+    } catch (err: any) {
+      if (err.code === "23505") {
+        // Unique violation
+        res
+          .status(409)
+          .json({ message: "User with this email already exists" });
+        return;
+      }
       next(err);
       return;
     }
@@ -112,32 +113,29 @@ router.post(
 );
 
 /**
- * PUT /api/users/:id
- * Обновляет только переданные поля (динамически)
+ * PUT /api/users/:guid
+ * Обновляет только переданные поля
  */
 router.put(
-  "/:id",
+  "/:guid",
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const id = Number(req.params.id);
-      if (Number.isNaN(id)) {
-        res.status(400).json({ message: "Invalid id" });
+      const guid = req.params.guid;
+      if (!guid) {
+        res.status(400).json({ message: "Invalid guid" });
         return;
       }
 
-      const {
-        fio,
-        birth_date,
-        email,
-        phone,
-        password,
-        passport_data,
-        is_in_db,
-        is_manager,
-        is_admin,
-      } = req.body;
+      const { fio, birth_date, email, phone, password } = req.body;
 
-      const updated_at = new Date().toISOString();
+      // Проверяем существование пользователя
+      const userExists = await query("SELECT guid FROM users WHERE guid = $1", [
+        guid,
+      ]);
+      if (!userExists.rows.length) {
+        res.status(404).json({ message: "User not found" });
+        return;
+      }
 
       const fields: string[] = [];
       const values: any[] = [];
@@ -159,32 +157,22 @@ router.put(
         fields.push(`phone = $${idx++}`);
         values.push(phone);
       }
-      if (passport_data !== undefined) {
-        fields.push(`passport_data = $${idx++}`);
-        values.push(passport_data);
-      }
-      if (is_in_db !== undefined) {
-        fields.push(`is_in_db = $${idx++}`);
-        values.push(is_in_db);
-      }
-      if (is_manager !== undefined) {
-        fields.push(`is_manager = $${idx++}`);
-        values.push(is_manager);
-      }
-      if (is_admin !== undefined) {
-        fields.push(`is_admin = $${idx++}`);
-        values.push(is_admin);
-      }
 
-      if (password !== undefined && password !== null && password !== "") {
-        const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+      // Обработка пароля
+      if (password !== undefined && password !== "") {
+        const salt_password = randomUUID();
+        const password_hash = await bcrypt.hash(
+          password + salt_password,
+          SALT_ROUNDS
+        );
         fields.push(`password_hash = $${idx++}`);
         values.push(password_hash);
+        fields.push(`salt_password = $${idx++}`);
+        values.push(salt_password);
       }
 
       // Всегда обновляем updated_at
-      fields.push(`updated_at = $${idx++}`);
-      values.push(updated_at);
+      fields.push(`updated_at = NOW()`);
 
       if (fields.length === 0) {
         res.status(400).json({ message: "No fields to update" });
@@ -193,17 +181,19 @@ router.put(
 
       const sql = `UPDATE users SET ${fields.join(
         ", "
-      )} WHERE id = $${idx} RETURNING *`;
-      values.push(id);
+      )} WHERE guid = $${idx} RETURNING guid, fio, birth_date, email, phone, created_at, updated_at`;
+      values.push(guid);
 
       const result = await query(sql, values);
-      if (!result.rows.length) {
-        res.status(404).json({ message: "Not found" });
-        return;
-      }
       res.json(result.rows[0]);
       return;
-    } catch (err) {
+    } catch (err: any) {
+      if (err.code === "23505") {
+        res
+          .status(409)
+          .json({ message: "User with this email already exists" });
+        return;
+      }
       next(err);
       return;
     }
@@ -211,26 +201,28 @@ router.put(
 );
 
 /**
- * DELETE /api/users/:id
+ * DELETE /api/users/:guid
  */
 router.delete(
-  "/:id",
+  "/:guid",
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const id = Number(req.params.id);
-      if (Number.isNaN(id)) {
-        res.status(400).json({ message: "Invalid id" });
+      const guid = req.params.guid;
+      if (!guid) {
+        res.status(400).json({ message: "Invalid guid" });
         return;
       }
 
       const result = await query(
-        "DELETE FROM users WHERE id = $1 RETURNING *",
-        [id]
+        "DELETE FROM users WHERE guid = $1 RETURNING guid, fio, email",
+        [guid]
       );
+
       if (!result.rows.length) {
-        res.status(404).json({ message: "Not found" });
+        res.status(404).json({ message: "User not found" });
         return;
       }
+
       res.json({ success: true, deleted: result.rows[0] });
       return;
     } catch (err) {
