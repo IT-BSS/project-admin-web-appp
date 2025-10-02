@@ -5,6 +5,7 @@
         <h1 class="auth-form__title">Создать аккаунт</h1>
         <p class="auth-form__subtitle">Присоединяйтесь к нашему сообществу</p>
       </div>
+<<<<<<< HEAD
       
       <form class="auth-form__form">
         <div class="input-row">
@@ -96,6 +97,47 @@
       <div class="auth-form__footer">
         <p class="auth-form__switch-text">
           Уже есть аккаунт? 
+=======
+
+      <form class="auth-form__form" @submit.prevent="onSubmit">
+        <div class="input-group">
+          <label class="input-group__label" for="fullName">ФИО</label>
+          <input v-model="fio" id="fullName" type="text" class="input-group__input" placeholder="Иванов Иван Иванович" autocomplete="name" required>
+        </div>
+
+        <div class="input-group">
+          <label class="input-group__label" for="birthDate">Дата рождения</label>
+          <input v-model="birthDate" id="birthDate" type="date" class="input-group__input" autocomplete="bday" required>
+        </div>
+
+        <div class="input-group">
+          <label class="input-group__label" for="email">Email</label>
+          <input v-model="email" id="email" type="email" class="input-group__input" placeholder="example@mail.com" autocomplete="email" required>
+        </div>
+
+        <div class="input-group">
+          <label class="input-group__label" for="phone">Телефон</label>
+          <input v-model="phone" id="phone" type="tel" class="input-group__input" placeholder="+7 (999) 123-45-67" autocomplete="tel" required>
+        </div>
+
+        <div class="input-group">
+          <label class="input-group__label" for="newPassword">Пароль</label>
+          <input v-model="password" id="newPassword" type="password" class="input-group__input" placeholder="Придумайте надежный пароль" autocomplete="new-password" required>
+        </div>
+
+        <div class="input-group">
+          <label class="input-group__label" for="confirmPassword">Подтвердите пароль</label>
+          <input v-model="confirmPassword" id="confirmPassword" type="password" class="input-group__input" placeholder="Повторите пароль" autocomplete="new-password" required>
+        </div>
+
+        <!-- 🚀 вот здесь кнопка -->
+        <button type="submit" class="auth-form__submit">Зарегистрироваться</button>
+      </form>
+
+      <div class="auth-form__footer">
+        <p class="auth-form__switch-text">
+          Уже есть аккаунт?
+>>>>>>> origin/main
           <nuxt-link to="/login" class="auth-form__switch-link">Войти</nuxt-link>
         </p>
       </div>
@@ -104,7 +146,53 @@
 </template>
 
 <script setup lang="ts">
+<<<<<<< HEAD
 // TODO: Link everything to the backend when it's ready
+=======
+import { ref } from "vue";
+import { useAuth } from "~~/composables/useAuth";
+import {useAuthStore} from "~~/stores/auth";
+
+const {registerUser} = useAuth();
+
+const authStore = useAuthStore()
+
+const fio = ref("");
+const birthDate = ref(Date);
+const email = ref("");
+const phone = ref("");
+const password = ref("");
+const confirmPassword = ref("");
+
+const onSubmit = async () => {
+  if (password.value !== confirmPassword.value) {
+    alert("Бро, пароли одинаковые напиши");
+    return;
+  }
+
+  try {
+    const dto = {
+      fio: fio.value,
+      birth_date: birthDate.value,
+      email: email.value,
+      phone: phone.value,
+      password: password.value,
+    };
+    const res = await registerUser(dto);
+
+    if (res?.tokens.accessToken)
+    {
+      authStore.setTokens(res.tokens.accessToken);
+
+      await authStore.fetchUser();
+    }
+    console.log("Регистрация успешна:", res);
+    alert("Бро, ты зарегался");
+  } catch (e) {
+    alert("Чет ошибка какая-то");
+  }
+};
+>>>>>>> origin/main
 </script>
 
 <style scoped lang="scss">
