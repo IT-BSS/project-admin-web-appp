@@ -59,7 +59,14 @@ router.post(
   "/",
   async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-      const { fio, birth_date, email, phone, password } = req.body;
+      const {
+        fio,
+        birth_date,
+        email,
+        phone,
+        password,
+        role = "user", // Добавляем роль по умолчанию
+      } = req.body;
 
       // Проверка обязательных полей
       if (!fio || !email || !password) {
@@ -70,7 +77,11 @@ router.post(
       }
 
       const guid = randomUUID();
-      const salt_password = randomUUID(); // Генерируем соль
+      const salt_password = randomUUID();
+
+      // Определяем роли на основе выбранной роли
+      const is_manager = role === "manager";
+      const is_admin = role === "admin";
 
       // Хешируем пароль с солью
       const password_hash = await bcrypt.hash(
@@ -80,9 +91,9 @@ router.post(
 
       const insertQuery = `
         INSERT INTO users 
-        (guid, fio, birth_date, email, phone, password_hash, salt_password, created_at, updated_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), NOW())
-        RETURNING guid, fio, birth_date, email, phone, created_at, updated_at;
+        (guid, fio, birth_date, email, phone, password_hash, salt_password, is_manager, is_admin, created_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())
+        RETURNING guid, fio, birth_date, email, phone, is_manager, is_admin, created_at, updated_at;
       `;
 
       const values = [
@@ -93,6 +104,8 @@ router.post(
         phone || null,
         password_hash,
         salt_password,
+        is_manager,
+        is_admin,
       ];
 
       const result = await query(insertQuery, values);
@@ -100,7 +113,6 @@ router.post(
       return;
     } catch (err: any) {
       if (err.code === "23505") {
-        // Unique violation
         res
           .status(409)
           .json({ message: "User with this email already exists" });
@@ -126,7 +138,7 @@ router.put(
         return;
       }
 
-      const { fio, birth_date, email, phone, password } = req.body;
+      const { fio, birth_date, email, phone, password, role } = req.body;
 
       // Проверяем существование пользователя
       const userExists = await query("SELECT guid FROM users WHERE guid = $1", [
@@ -158,6 +170,16 @@ router.put(
         values.push(phone);
       }
 
+      // Обработка роли
+      if (role !== undefined) {
+        const is_manager = role === "manager";
+        const is_admin = role === "admin";
+        fields.push(`is_manager = $${idx++}`);
+        values.push(is_manager);
+        fields.push(`is_admin = $${idx++}`);
+        values.push(is_admin);
+      }
+
       // Обработка пароля
       if (password !== undefined && password !== "") {
         const salt_password = randomUUID();
@@ -181,7 +203,7 @@ router.put(
 
       const sql = `UPDATE users SET ${fields.join(
         ", "
-      )} WHERE guid = $${idx} RETURNING guid, fio, birth_date, email, phone, created_at, updated_at`;
+      )} WHERE guid = $${idx} RETURNING guid, fio, birth_date, email, phone, is_manager, is_admin, created_at, updated_at`;
       values.push(guid);
 
       const result = await query(sql, values);

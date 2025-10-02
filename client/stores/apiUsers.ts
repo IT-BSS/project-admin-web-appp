@@ -8,6 +8,7 @@ export interface UserForm {
   email: string;
   phone: string;
   password: string;
+  role: string; // 'user', 'manager', 'admin'
 }
 
 export const useApiUsersStore = defineStore("apiUsers", {
@@ -20,6 +21,15 @@ export const useApiUsersStore = defineStore("apiUsers", {
   getters: {
     selectedUser(state): Users | undefined {
       return state.users.find((u) => u.guid === state.selectedUserId);
+    },
+
+    // Геттер для определения роли выбранного пользователя
+    selectedUserRole(state): string {
+      const user = state.users.find((u) => u.guid === state.selectedUserId);
+      if (!user) return "user";
+      if (user.is_admin) return "admin";
+      if (user.is_manager) return "manager";
+      return "user";
     },
   },
 
@@ -129,6 +139,13 @@ export const useApiUsersStore = defineStore("apiUsers", {
       if (this.users.length > 0) {
         this.selectedUserId = this.users[0].guid;
       }
+    },
+
+    // Вспомогательный метод для определения роли пользователя
+    getUserRole(user: Users): string {
+      if (user.is_admin) return "admin";
+      if (user.is_manager) return "manager";
+      return "user";
     },
   },
 });

@@ -10,7 +10,12 @@
           :class="{ active: store.selectedUserId === user.guid }"
           @click="store.selectUser(user.guid)"
         >
-          {{ user.fio }}
+          <div class="user-item">
+            <span class="user-name">{{ user.fio }}</span>
+            <span class="user-role" :class="getRoleClass(user)">{{
+              getRoleText(user)
+            }}</span>
+          </div>
         </li>
       </ul>
       <div v-else class="empty-list">
@@ -40,6 +45,14 @@
         <label>
           Телефон:
           <input v-model="form.phone" />
+        </label>
+        <label>
+          Роль:
+          <select v-model="form.role" class="role-select">
+            <option value="user">Пользователь</option>
+            <option value="manager">Менеджер</option>
+            <option value="admin">Администратор</option>
+          </select>
         </label>
         <label>
           Пароль:
@@ -89,6 +102,7 @@
 <script setup lang="ts">
 import { reactive, watch } from "vue";
 import { useApiUsersStore } from "../../stores/apiUsers";
+import type { Users } from "../../types/users";
 
 const store = useApiUsersStore();
 
@@ -100,6 +114,7 @@ const form = reactive({
   email: "",
   phone: "",
   password: "",
+  role: "user",
 });
 
 // Наблюдаем за изменениями выбранного пользователя
@@ -114,6 +129,7 @@ watch(
         email: user.email || "",
         phone: user.phone || "",
         password: "", // Пароль не показываем при редактировании
+        role: store.getUserRole(user),
       });
     }
   },
@@ -133,6 +149,7 @@ watch(
         email: "",
         phone: "",
         password: "",
+        role: "user",
       });
     }
   }
@@ -143,6 +160,19 @@ function formatDateForInput(date: Date | string): string {
   if (!date) return "";
   const d = new Date(date);
   return d.toISOString().split("T")[0];
+}
+
+// Функции для отображения ролей в списке
+function getRoleText(user: Users): string {
+  if (user.is_admin) return "Админ";
+  if (user.is_manager) return "Менеджер";
+  return "Пользователь";
+}
+
+function getRoleClass(user: Users): string {
+  if (user.is_admin) return "role-admin";
+  if (user.is_manager) return "role-manager";
+  return "role-user";
 }
 
 async function saveUser() {
@@ -228,6 +258,38 @@ function cancelCreate() {
   color: white;
 }
 
+.user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-name {
+  flex: 1;
+}
+
+.user-role {
+  font-size: 0.8em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+.role-admin {
+  background-color: #dc3545;
+  color: white;
+}
+
+.role-manager {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.role-user {
+  background-color: #6c757d;
+  color: white;
+}
+
 .empty-list {
   padding: 20px;
   text-align: center;
@@ -274,11 +336,16 @@ function cancelCreate() {
   font-size: 14px;
 }
 
-.user-form input {
+.user-form input,
+.user-form select {
   padding: 6px;
   margin-top: 4px;
   border: 1px solid #aaa;
   border-radius: 4px;
+}
+
+.role-select {
+  background-color: white;
 }
 
 .buttons {
