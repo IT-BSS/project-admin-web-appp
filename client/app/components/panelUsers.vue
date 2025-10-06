@@ -11,7 +11,7 @@
           @click="store.selectUser(user.guid)"
         >
           <div class="user-item">
-            <span class="user-name">{{ user.fio }}</span>
+            <span class="user-name">{{ (user as any).name }}</span>
             <span class="user-role" :class="getRoleClass(user)">{{
               getRoleText(user)
             }}</span>
@@ -31,12 +31,12 @@
       </h2>
       <form @submit.prevent="saveUser">
         <label>
-          ФИО:
-          <input v-model="form.fio" required />
+          name
+          <input v-model="(form as any).name" required />
         </label>
         <label>
           Дата рождения:
-          <input type="date" v-model="form.birth_date" />
+          <input type="date" v-model="(form as any).birthDate" />
         </label>
         <label>
           E-mail:
@@ -109,12 +109,15 @@ const store = useApiUsersStore();
 // Инициализируем форму
 const form = reactive({
   guid: "",
-  fio: "",
-  birth_date: "",
+  name: "",
+  surname: "",
+  middlename: "",
+  birthDate: "",
   email: "",
   phone: "",
   password: "",
-  role: "user",
+  isAdmin: false,
+  isManager: false
 });
 
 // Наблюдаем за изменениями выбранного пользователя
@@ -145,10 +148,11 @@ watch(
       Object.assign(form, {
         guid: "",
         fio: "",
-        birth_date: "",
+        birthDate: "",
         email: "",
         phone: "",
         password: "",
+        passportData: "",
         role: "user",
       });
     }
@@ -159,7 +163,7 @@ watch(
 function formatDateForInput(date: Date | string): string {
   if (!date) return "";
   const d = new Date(date);
-  return d.toISOString().split("T")[0];
+  return (d.toISOString().split("T")[0]) as string;
 }
 
 // Функции для отображения ролей в списке

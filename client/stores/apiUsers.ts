@@ -6,8 +6,8 @@ export interface UserForm {
   fio: string;
   birth_date: string;
   email: string;
-  phone: string;
-  password: string;
+  phone?: string;
+  password?: string;
   role: string; // 'user', 'manager', 'admin'
 }
 
@@ -20,6 +20,8 @@ export const useApiUsersStore = defineStore("apiUsers", {
 
   getters: {
     selectedUser(state): Users | undefined {
+      console.log("HERE:::::");
+      console.log(state.users);
       return state.users.find((u) => u.guid === state.selectedUserId);
     },
 
@@ -42,7 +44,7 @@ export const useApiUsersStore = defineStore("apiUsers", {
     setUsers(users: Users[]) {
       this.users = users;
       if (users.length > 0 && !this.selectedUserId) {
-        this.selectedUserId = users[0].guid;
+        this.selectedUserId = (users as any)[0].guid;
       }
     },
 
@@ -53,7 +55,7 @@ export const useApiUsersStore = defineStore("apiUsers", {
       try {
         const { guid, ...userToCreate } = userData;
 
-        const response = await $fetch(`${baseUrl}/api/users`, {
+        const response = await $fetch(`${baseUrl}/api/get_all_users`, {
           method: "POST",
           body: userToCreate,
         });
@@ -86,7 +88,7 @@ export const useApiUsersStore = defineStore("apiUsers", {
 
         const index = this.users.findIndex((u) => u.guid === userData.guid);
         if (index !== -1) {
-          this.users[index] = { ...this.users[index], ...response };
+          this.users[index] = { ...this.users[index], ...(response as any) };
         }
 
         return response;
@@ -108,7 +110,7 @@ export const useApiUsersStore = defineStore("apiUsers", {
         this.users = this.users.filter((u) => u.guid !== guid);
 
         if (this.selectedUserId === guid) {
-          this.selectedUserId = this.users.length > 0 ? this.users[0].guid : "";
+          this.selectedUserId = this.users.length > 0 ? (this.users as any)[0].guid : "";
         }
       } catch (error: any) {
         console.error("Ошибка при удалении пользователя:", error);
@@ -121,8 +123,8 @@ export const useApiUsersStore = defineStore("apiUsers", {
       const baseUrl = config.public.apiBaseUrl;
 
       try {
-        const users = await $fetch(`${baseUrl}/api/users`);
-        this.setUsers(users);
+        const users = await $fetch(`${baseUrl}/api/get_all_   users`);
+        this.setUsers(users as any);
       } catch (error) {
         console.error("Ошибка при загрузке пользователей:", error);
         throw error;
@@ -137,7 +139,7 @@ export const useApiUsersStore = defineStore("apiUsers", {
     cancelCreating() {
       this.isCreatingNew = false;
       if (this.users.length > 0) {
-        this.selectedUserId = this.users[0].guid;
+        this.selectedUserId = (this.users as any)[0].guid;
       }
     },
 

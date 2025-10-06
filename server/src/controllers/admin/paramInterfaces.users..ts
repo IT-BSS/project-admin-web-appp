@@ -20,6 +20,19 @@ export interface AddUserBody {
   passportData: string
 }
 
+export interface EditUserBody {
+  id: string,
+  name: string,
+  surname: string,
+  middlename: string,
+  birthDate: string,
+  email: string,
+  login: string,
+  phone: string,
+  password: string,
+  passportData: string
+}
+
 export interface BanUserBody
 {
   id: string;

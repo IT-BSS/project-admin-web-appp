@@ -1,6 +1,11 @@
 import type { Request, Response } from 'express'
 import { User } from '../../models/user/user.model'
-import type { GetUserQuery, GetAllUsersQuery, AddUserBody,BanUserBody } from './paramInterfaces.users.';
+import type { 
+  GetUserQuery, 
+  GetAllUsersQuery, 
+  AddUserBody,
+  EditUserBody,
+  BanUserBody } from './paramInterfaces.users.';
 
 export async function getAllUsers(req: Request<{}, {}, {}, GetAllUsersQuery>, res: Response) {
   try {
@@ -96,9 +101,7 @@ export async function addUser(req: Request<{}, {}, AddUserBody, {}>, res: Respon
         email, login, phone, 
         password, 
         passportData } = req.body;
-        console.log("NAME: ", name);
-        console.log("LOGIN: ", login);
-        
+
         if (!name)          return res.status(400).json({ error: "Необходимо имя пользователя." });
         if (!surname)       return res.status(400).json({ error: "Необходима фамилия пользователя." });
         if (!middlename)    return res.status(400).json({ error: "Необходимо отчество пользователя." });
@@ -122,15 +125,39 @@ export async function addUser(req: Request<{}, {}, AddUserBody, {}>, res: Respon
           isAdmin,
         });
         
-        console.log("New user with GUID: ", user.guid);
         res.status(200).json({ id: user.guid });
 
-  } catch(error: any) {
+  } catch (error: any) {
       console.error("Ошибка при обработке запроса на добавление пользователя: ", error);
       res.status(500).json({ error: "Сервер недоступен." });
   }
 }
 
-export async function editUser(req: Request, res: Response) {
+export async function editUser(req: Request<{}, {}, EditUserBody, {}>, res: Response) {
+  try {
+    const { id, name, surname, middlename, 
+        birthDate, 
+        email, login, phone, 
+        password, 
+        passportData } = req.body;
 
+    // Так как какие-то поля могут быть пустыми в теле запроса (т.е их не нужно обновлять),
+    // было решено найти пользователя по GUID и каждое поле обновлять отдельно, если оно есть,
+    // вместо того, чтобы пользоваться User.update(...).
+
+    const user: User | null = await User.findOne({ where: { guid: id }});
+    if (!user) return res.status(404).json({ error: "Пользователя с данным ID не существует." });
+
+    if (name) user.name = name;
+    if (surname) user.surname = surname;
+    if (middlename) user.middlename = middlename;
+    if (birthDate) user.birthDate = birthDate;
+    if (email) user.email = email;
+    if (login) user.login = login;
+    if (phone) user.phone = phone;
+    if (password) user.passwordHash = password; // TODO TOP-PRIORITY - написать функцию хэширования пароля
+  } catch (error: any) {
+    console.error("Ошибка при обработке запроса на изменение данных пользователя: ", error);
+    res.status(500).json({ error: "Сервер недоступен. "});
+  }
 }
