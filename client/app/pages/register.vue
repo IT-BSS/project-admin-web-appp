@@ -5,11 +5,98 @@
         <h1 class="auth-form__title">Создать аккаунт</h1>
         <p class="auth-form__subtitle">Присоединяйтесь к нашему сообществу</p>
       </div>
+      <form class="auth-form__form">
+        <div class="input-row">
+          <div class="input-group">
+            <label class="input-group__label" for="firstName">Имя</label>
+            <input 
+              id="firstName"
+              type="text" 
+              class="input-group__input" 
+              placeholder="Ваше имя"
+              autocomplete="given-name"
+            >
+          </div>
+          
+          <div class="input-group">
+            <label class="input-group__label" for="lastName">Фамилия</label>
+            <input 
+              id="lastName"
+              type="text" 
+              class="input-group__input" 
+              placeholder="Ваша фамилия"
+              autocomplete="family-name"
+            >
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label class="input-group__label" for="email">Email</label>
+          <input 
+            id="email"
+            type="email" 
+            class="input-group__input" 
+            placeholder="example@mail.com"
+            autocomplete="email"
+          >
+        </div>
+        
+        <div class="input-group">
+          <label class="input-group__label" for="username">Логин</label>
+          <input 
+            id="username"
+            type="text" 
+            class="input-group__input" 
+            placeholder="Придумайте логин"
+            autocomplete="username"
+          >
+        </div>
+        
+        <div class="input-group">
+          <label class="input-group__label" for="newPassword">Пароль</label>
+          <input 
+            id="newPassword"
+            type="password" 
+            class="input-group__input" 
+            placeholder="Придумайте надежный пароль"
+            autocomplete="new-password"
+          >
+        </div>
+        
+        <div class="input-group">
+          <label class="input-group__label" for="confirmPassword">Подтвердите пароль</label>
+          <input 
+            id="confirmPassword"
+            type="password" 
+            class="input-group__input" 
+            placeholder="Повторите пароль"
+            autocomplete="new-password"
+          >
+        </div>
+        
+        <div class="auth-form__agreement">
+          <label class="checkbox">
+            <input type="checkbox" class="checkbox__input">
+            <span class="checkbox__checkmark"></span>
+            <span class="checkbox__label">
+              Я согласен с 
+              <a href="#" class="agreement-link">условиями использования</a> 
+              и 
+              <a href="#" class="agreement-link">политикой конфиденциальности</a>
+            </span>
+          </label>
+        </div>
+        
+        <button type="submit" class="btn btn--primary btn--full-width">
+          Создать аккаунт
+        </button>
+      </form>
+      
+      <div class="auth-form__footer">
+        <p class="auth-form__switch-text">
+          Уже есть аккаунт?
+        </p>
 
-<<<<<<< HEAD
-
-=======
->>>>>>> f888b6f (add autorize and login with token, 01/10/25 3:00)
       <form class="auth-form__form" @submit.prevent="onSubmit">
         <div class="input-group">
           <label class="input-group__label" for="fullName">ФИО</label>
@@ -52,14 +139,11 @@
         </p>
       </div>
     </div>
+    </div>
   </main>
 </template>
 
 <script setup lang="ts">
-<<<<<<< HEAD
-
-=======
->>>>>>> f888b6f (add autorize and login with token, 01/10/25 3:00)
 import { ref } from "vue";
 import { useAuth } from "~~/composables/useAuth";
 import {useAuthStore} from "~~/stores/auth";

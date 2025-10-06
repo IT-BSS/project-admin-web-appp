@@ -1,6 +1,7 @@
-// src/controller/auth/authController.ts
-import type { RegisterUserDTO, LoginUserDTO } from "../../models/auth/userModel.js";
-import { Request, Response } from "express";
+// когда протрезвеете, переписать всё это срочно
+
+/*import type { RegisterUserDTO, LoginUserDTO } from "../../models/auth/userModel.js";
+import type { Request, Response } from "express";
 import * as authService from "../../services/auth/authService.js";
 
 export const registerHandler = async (req: any, res: any) => {
@@ -60,4 +61,4 @@ export const profileHandler = async (req: any, res: any) => {
   } catch (err: any) {
     return res.status(500).json({ error: err.message });
   }
-};
+};*/

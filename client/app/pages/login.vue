@@ -6,10 +6,6 @@
         <p class="auth-form__subtitle">Добро пожаловать! Войдите в свой аккаунт</p>
       </div>
 
-<<<<<<< HEAD
-
-=======
->>>>>>> f888b6f (add autorize and login with token, 01/10/25 3:00)
       <form class="auth-form__form" @submit.prevent="onSubmit">
         <div class="input-group">
           <label class="input-group__label" for="login">Логин или Email</label>
@@ -52,10 +48,6 @@
       <div class="auth-form__footer">
         <p class="auth-form__switch-text">
           Нет аккаунта?
-<<<<<<< HEAD
-
-=======
->>>>>>> f888b6f (add autorize and login with token, 01/10/25 3:00)
           <nuxt-link to="/register" class="auth-form__switch-link">Зарегистрироваться</nuxt-link>
         </p>
       </div>
@@ -64,10 +56,6 @@
 </template>
 
 <script setup lang="ts">
-<<<<<<< HEAD
-
-=======
->>>>>>> f888b6f (add autorize and login with token, 01/10/25 3:00)
 import {ref} from "vue";
 import { useAuth } from "~~/composables/useAuth";
 import {useAuthStore} from "~~/stores/auth";
@@ -101,15 +89,12 @@ const onSubmit = async () => {
     } else {
       alert('Токен не получен');
     }
-  } catch (e) {
+  } catch (e: any) {
     console.error('Ошибка входа:', e);
     alert('Бро ошибка какая-то: ' + (e.message || 'Неизвестная ошибка'));
   }
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> f888b6f (add autorize and login with token, 01/10/25 3:00)
 </script>
 
 <style scoped lang="scss">
@@ -345,7 +330,6 @@ const onSubmit = async () => {
 @media (max-width: 480px) {
   .auth-form {
     margin: 10px;
-
     &__header {
       padding: 32px 24px 20px;
     }

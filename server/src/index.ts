@@ -1,8 +1,12 @@
 import sequelize from "./db/db";
 import app from "./app";
 
-const PORT = 3001;
-const HOST = '0.0.0.0'; // Что бы можно было принимать запросы с мобилки
+const PORT = 3000;
+const HOST = '0.0.0.0'; // Чтобы можно было принимать запросы с мобилки
+
+// Чтобы при изменениях в таблицах (добавление/удаление новых свойств у сущностей)
+// таблицы изменялись и в базе данных
+sequelize.sync({ alter: true }); 
 
 sequelize.authenticate()
   .then(() => {

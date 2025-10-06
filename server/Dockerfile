@@ -20,10 +20,10 @@ COPY . .
 RUN mkdir -p logs
 
 # Запускаем сборку
-RUN pnpm run build
+RUN pnpm run start
 
 # Открываем порт (сервер слушает на 3000)
 EXPOSE 3000
 
 # Запуск приложения — здесь “dev”, можно поменять на “start” или др. команду
-CMD ["pnpm", "dev"]
+CMD ["pnpm", "start"]

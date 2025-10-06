@@ -1,6 +1,6 @@
 /// <reference types="@pinia/nuxt" />
-/// <reference types="@nuxt/devtools" />
 /// <reference types="@nuxtjs/google-fonts" />
+/// <reference types="@nuxt/devtools" />
 /// <reference types="@nuxt/image" />
 /// <reference types="@nuxt/telemetry" />
 /// <reference path="types/builder-env.d.ts" />

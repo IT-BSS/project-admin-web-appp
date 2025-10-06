@@ -40,8 +40,6 @@ export const getUserByGuid = async (guid: string) => {
   return res.rows[0] as User | undefined;
 };
 
-
-
 export const saveRefreshToken = async (guid: string, refreshToken: string | null) => {
   await query("UPDATE users SET refresh_token = $1, updated_at = now() WHERE guid = $2", [
     refreshToken,
