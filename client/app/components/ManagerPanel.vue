@@ -5,53 +5,41 @@
     <!-- Список менеджеров -->
     <div class="users-list">
       <div
-          v-for="(user, index) in users"
-          :key="user.id || index"
+          v-for="(user, index) in users.result"
+          :key="user.guid"
           class="manager-item"
           :class="{ active: selectedUserIndex === index }"
           @click="selectManager(index)"
       >
-        {{ user.fio }}
+        {{ getFullName(user) }}
       </div>
     </div>
 
     <!-- Пагинация -->
-    <div class="pagination">
+    <div v-if="users.pagination && users.pagination.totalPages > 1" class="pagination">
       <button
+          v-for="page in users.pagination.totalPages"
+          :key="page"
           class="pagination-btn"
-          :class="{ active: currentPage === 1 }"
-          @click="goToPage(1)"
+          :class="{ active: currentPage === page }"
+          @click="goToPage(page)"
       >
-        1
+        {{ page }}
       </button>
       <button
-          class="pagination-btn"
-          :class="{ active: currentPage === 2 }"
-          @click="goToPage(2)"
+          class="pagination-btn next"
+          :disabled="currentPage >= users.pagination.totalPages"
+          @click="nextPage"
       >
-        2
-      </button>
-      <button
-          class="pagination-btn"
-          :class="{ active: currentPage === 3 }"
-          @click="goToPage(3)"
-      >
-        3
-      </button>
-      <button
-          class="pagination-btn"
-          :class="{ active: currentPage === 4 }"
-          @click="goToPage(4)"
-      >
-        4
-      </button>
-      <button class="pagination-btn next" @click="nextPage">
         >
       </button>
     </div>
 
     <!-- Детали менеджера -->
-    <div v-if="selectedUserIndex !== null && users[selectedUserIndex]" class="manager-details">
+    <div
+        v-if="selectedUserIndex !== null && users.result && users.result[selectedUserIndex]"
+        class="manager-details"
+    >
       <div class="tabs">
         <button
             class="tab"
@@ -79,45 +67,105 @@
       <!-- Данные выбранного пользователя -->
       <div v-if="activeDetailTab === 'data'" class="form-section">
         <div class="form-row">
-          <label>ФИО</label>
-          <input
-              type="text"
-              v-model="selectedUser.fio"
-              class="form-input"
-          />
+          <label>Имя</label>
+          <input type="text" v-model="editedUser.name" class="form-input" :disabled="!isEditing" />
+        </div>
+        <div class="form-row">
+          <label>Фамилия</label>
+          <input type="text" v-model="editedUser.surname" class="form-input" :disabled="!isEditing" />
+        </div>
+        <div class="form-row">
+          <label>Отчество</label>
+          <input type="text" v-model="editedUser.middlename" class="form-input" :disabled="!isEditing" />
+        </div>
+        <div class="form-row">
+          <label>Логин</label>
+          <input type="text" v-model="editedUser.login" class="form-input" :disabled="!isEditing" />
         </div>
         <div class="form-row">
           <label>Дата рождения</label>
-          <input
-              type="text"
-              v-model="selectedUser.birth_date"
-              class="form-input"
-          />
+          <input type="text" v-model="editedUser.birthDate" class="form-input" :disabled="!isEditing" />
         </div>
         <div class="form-row">
           <label>Email</label>
-          <input
-              type="text"
-              v-model="selectedUser.email"
-              class="form-input"
-          />
+          <input type="text" v-model="editedUser.email" class="form-input" :disabled="!isEditing" />
         </div>
         <div class="form-row">
           <label>Телефон</label>
-          <input
-              type="text"
-              v-model="selectedUser.phone"
-              class="form-input"
-          />
+          <input type="text" v-model="editedUser.phone" class="form-input" :disabled="!isEditing" />
+        </div>
+        <div class="form-row">
+          <label>Паспортные данные</label>
+          <input type="text" v-model="editedUser.passportData" class="form-input" :disabled="!isEditing" />
+        </div>
+        <div v-if="isEditing" class="form-row">
+          <label>Пароль (оставьте пустым, если не хотите менять)</label>
+          <input type="password" v-model="editedUser.password" class="form-input" placeholder="Новый пароль" />
+        </div>
+
+        <div class="form-actions">
+          <button v-if="!isEditing" @click="startEditing" class="btn btn-primary">
+            Редактировать
+          </button>
+          <template v-else>
+            <button @click="saveChanges" class="btn btn-success" :disabled="isSaving">
+              {{ isSaving ? 'Сохранение...' : 'Сохранить' }}
+            </button>
+            <button @click="cancelEditing" class="btn btn-secondary" :disabled="isSaving">
+              Отмена
+            </button>
+          </template>
+        </div>
+
+        <div v-if="saveMessage" class="message" :class="saveMessageType">
+          {{ saveMessage }}
         </div>
       </div>
 
-      <!-- Другие вкладки -->
+      <!-- Вкладка Роли -->
       <div v-if="activeDetailTab === 'roles'" class="tab-content">
         <h3>Роли пользователя</h3>
-        <!-- Контент для ролей -->
+        <div class="form-section">
+          <div class="form-row">
+            <label>
+              <input type="checkbox" v-model="editedUser.isBanned" :disabled="!isEditingRoles" />
+              Заблокирован
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              <input type="checkbox" v-model="editedUser.isManager" :disabled="!isEditingRoles" />
+              Менеджер
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              <input type="checkbox" v-model="editedUser.isAdmin" :disabled="!isEditingRoles" />
+              Администратор
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button v-if="!isEditingRoles" @click="startEditingRoles" class="btn btn-primary">
+              Редактировать роли
+            </button>
+            <template v-else>
+              <button @click="saveRoles" class="btn btn-success" :disabled="isSavingRoles">
+                {{ isSavingRoles ? 'Сохранение...' : 'Сохранить' }}
+              </button>
+              <button @click="cancelEditingRoles" class="btn btn-secondary" :disabled="isSavingRoles">
+                Отмена
+              </button>
+            </template>
+          </div>
+
+          <div v-if="rolesMessage" class="message" :class="rolesMessageType">
+            {{ rolesMessage }}
+          </div>
+        </div>
       </div>
 
+      <!-- Вкладка Организации -->
       <div v-if="activeDetailTab === 'organizations'" class="tab-content">
         <h3>Организации пользователя</h3>
         <!-- Контент для организаций -->
@@ -125,31 +173,101 @@
     </div>
 
     <!-- Сообщение если нет пользователей -->
-    <div v-if="users.length === 0" class="no-users">
+    <div v-if="!users.result || users.result.length === 0" class="no-users">
       <p>Нет данных о менеджерах</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import type { Users } from "../../types/users";
+import { ref, computed, watch } from 'vue'
+import axios from 'axios'
+
+interface User {
+  guid: string;
+  name: string;
+  surname: string;
+  middlename: string;
+  login: string;
+  birthDate: string;
+  email: string;
+  phone: string;
+  passportData: string;
+  isBanned: boolean;
+  isManager: boolean;
+  isAdmin: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface UsersResponse {
+  result: User[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
 
 interface Props {
-  users: Users;
+  users: UsersResponse;
 }
 
 const props = defineProps<Props>();
+const emit = defineEmits(['refresh']);
+
 const selectedUserIndex = ref<number | null>(null)
 const currentPage = ref(1)
 const activeDetailTab = ref('data')
+const isEditing = ref(false)
+const isEditingRoles = ref(false)
+const isSaving = ref(false)
+const isSavingRoles = ref(false)
+const saveMessage = ref('')
+const saveMessageType = ref('')
+const rolesMessage = ref('')
+const rolesMessageType = ref('')
+
+const editedUser = ref<User & { password?: string }>({
+  guid: '',
+  name: '',
+  surname: '',
+  middlename: '',
+  login: '',
+  birthDate: '',
+  email: '',
+  phone: '',
+  passportData: '',
+  isBanned: false,
+  isManager: false,
+  isAdmin: false,
+  createdAt: '',
+  updatedAt: '',
+  password: ''
+})
 
 const selectedUser = computed(() => {
-  if (selectedUserIndex.value !== null && props.users[selectedUserIndex.value]) {
-    return props.users[selectedUserIndex.value];
+  if (selectedUserIndex.value !== null && props.users.result && props.users.result[selectedUserIndex.value]) {
+    return props.users.result[selectedUserIndex.value];
   }
   return null;
 });
+
+// Отслеживаем изменение выбранного пользователя
+watch(selectedUser, (newUser) => {
+  if (newUser) {
+    editedUser.value = { ...newUser, password: '' };
+    isEditing.value = false;
+    isEditingRoles.value = false;
+    saveMessage.value = '';
+    rolesMessage.value = '';
+  }
+}, { immediate: true });
+
+function getFullName(user: User): string {
+  return `${user.surname} ${user.name} ${user.middlename}`.trim();
+}
 
 function selectManager(index: number) {
   selectedUserIndex.value = index;
@@ -158,11 +276,120 @@ function selectManager(index: number) {
 
 function goToPage(page: number) {
   currentPage.value = page;
+  emit('page-changed', page);
 }
 
 function nextPage() {
-  if (currentPage.value < 4) {
+  if (props.users.pagination && currentPage.value < props.users.pagination.totalPages) {
     currentPage.value++;
+    emit('page-changed', currentPage.value);
+  }
+}
+
+function startEditing() {
+  isEditing.value = true;
+  saveMessage.value = '';
+}
+
+function cancelEditing() {
+  if (selectedUser.value) {
+    editedUser.value = { ...selectedUser.value, password: '' };
+  }
+  isEditing.value = false;
+  saveMessage.value = '';
+}
+
+async function saveChanges() {
+  if (!editedUser.value) return;
+
+  isSaving.value = true;
+  saveMessage.value = '';
+
+  try {
+    const config = useRuntimeConfig();
+    const baseUrl = config.public.apiBaseUrl;
+
+    const payload: any = {
+      name: editedUser.value.name,
+      surname: editedUser.value.surname,
+      middlename: editedUser.value.middlename,
+      birthday: editedUser.value.birthDate,
+      email: editedUser.value.email,
+      login: editedUser.value.login,
+      phone: editedUser.value.phone,
+      passport_data: editedUser.value.passportData,
+    };
+
+    // Добавляем пароль только если он был введен
+    if (editedUser.value.password && editedUser.value.password.trim() !== '') {
+      payload.password = editedUser.value.password;
+    }
+
+    await axios.post(`${baseUrl}/api/edit_user`, payload);
+
+    saveMessage.value = 'Изменения успешно сохранены';
+    saveMessageType.value = 'success';
+    isEditing.value = false;
+    editedUser.value.password = '';
+
+    // Обновляем список пользователей
+    emit('refresh');
+  } catch (error) {
+    console.error('Ошибка при сохранении:', error);
+    saveMessage.value = 'Ошибка при сохранении изменений';
+    saveMessageType.value = 'error';
+  } finally {
+    isSaving.value = false;
+  }
+}
+
+function startEditingRoles() {
+  isEditingRoles.value = true;
+  rolesMessage.value = '';
+}
+
+function cancelEditingRoles() {
+  if (selectedUser.value) {
+    editedUser.value.isBanned = selectedUser.value.isBanned;
+    editedUser.value.isManager = selectedUser.value.isManager;
+    editedUser.value.isAdmin = selectedUser.value.isAdmin;
+  }
+  isEditingRoles.value = false;
+  rolesMessage.value = '';
+}
+
+async function saveRoles() {
+  if (!editedUser.value) return;
+
+  isSavingRoles.value = true;
+  rolesMessage.value = '';
+
+  try {
+    const config = useRuntimeConfig();
+    const baseUrl = config.public.apiBaseUrl;
+
+    // Если пользователь заблокирован, отправляем запрос на блокировку
+    if (editedUser.value.isBanned && selectedUser.value && !selectedUser.value.isBanned) {
+      await axios.post(`${baseUrl}/api/banuser`, {
+        login: editedUser.value.login
+      });
+    }
+
+    // Для остальных ролей можно использовать edit_user
+    // (предполагается, что API поддерживает обновление ролей через этот эндпоинт)
+
+    rolesMessage.value = 'Роли успешно обновлены';
+    rolesMessageType.value = 'success';
+    isEditingRoles.value = false;
+
+    // Обновляем список пользователей
+    emit('refresh');
+  } catch (error) {
+    console.error('Ошибка при обновлении ролей:', error);
+    rolesMessage.value = 'Ошибка при обновлении ролей';
+    rolesMessageType.value = 'error';
+  } finally {
+    isSavingRoles.value = false;
   }
 }
 </script>
@@ -336,5 +563,15 @@ background: linear-gradient(137deg, #3a6ce9 0%, #618eff 100%)
 }
 .form-row label{
   color: white;
+}
+
+
+.tab-content {
+  padding: 20px;
+}
+
+.tab-content h3 {
+  margin-bottom: 20px;
+  color: #333;
 }
 </style>

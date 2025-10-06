@@ -16,6 +16,7 @@ router.route('/get_all_users')
 
 router.route('/add_user')
     .post(upload.none(), asyncHandler(manageUsersController.addUser));
+    
 router.route('/edit_user')
     .post(upload.none(), asyncHandler(manageUsersController.editUser));
 

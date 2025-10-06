@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 
+<<<<<<< HEAD
 // Получаем параметры подключения из переменных окружения
 const dbName = process.env.DB_NAME || "webapp";
 const dbUser = process.env.DB_USER || "postgres";
@@ -26,6 +27,19 @@ const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
     max: 3, // Количество попыток переподключения
   },
 });
+=======
+const sequelize = new Sequelize(
+  "postgres",
+  "postgres",
+  "qwer4123",
+  {
+    host: "localhost",
+    port: 5432,
+    dialect: "postgres",
+    logging: false, // убрать SQL в консоли
+  }
+);
+>>>>>>> origin/dev_egor
 
 (async () => {
   try {
@@ -42,3 +56,31 @@ const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
 })();
 
 export default sequelize;
+<<<<<<< HEAD
+=======
+
+// import { Sequelize } from "sequelize";
+
+// const sequelize = new Sequelize(
+//   "webapp",   
+//   "postgres",     
+//   "admin",   
+//   {
+//     host: "localhost",
+//     port: 5432,
+//     dialect: "postgres",
+//     logging: false, // убрать SQL в консоли
+//   }
+// );
+
+// (async () => {
+//   try {
+//     await sequelize.authenticate();
+//     console.log("Successful connection to database.");
+//   } catch (error) {
+//     console.error("Couldn't connect to database:", error);
+//   }
+// })();
+
+// export default sequelize;
+>>>>>>> origin/dev_egor
