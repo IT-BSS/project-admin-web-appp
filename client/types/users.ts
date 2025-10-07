@@ -1,13 +1,26 @@
 export interface Users {
   id: string;
   guid: string;
-  GUID: string;
-  fio: string;
-  birth_date: Date;
+  name: string;
+  surname: string;
+  middlename: string;
+  login: string,
+  birthDate: Date;
   email: string;
   phone: string;
-  is_manager: boolean;
-  is_admin: boolean;
+  passportData: string;
+  isManager: boolean;
+  isAdmin: boolean;
+  isBanned: boolean;
+}
+
+export interface User {
+  guid: string;
+  name: string;
+  surname: string;
+  middlename: string;
+  birthDate: string;
+
 }
 
 export interface UsersResponse {

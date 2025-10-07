@@ -5,8 +5,6 @@
         <h1 class="auth-form__title">Создать аккаунт</h1>
         <p class="auth-form__subtitle">Присоединяйтесь к нашему сообществу</p>
       </div>
-<<<<<<< HEAD
-      
       <form class="auth-form__form">
         <div class="input-row">
           <div class="input-group">
@@ -96,8 +94,8 @@
       
       <div class="auth-form__footer">
         <p class="auth-form__switch-text">
-          Уже есть аккаунт? 
-=======
+          Уже есть аккаунт?
+        </p>
 
       <form class="auth-form__form" @submit.prevent="onSubmit">
         <div class="input-group">
@@ -137,18 +135,15 @@
       <div class="auth-form__footer">
         <p class="auth-form__switch-text">
           Уже есть аккаунт?
->>>>>>> origin/main
           <nuxt-link to="/login" class="auth-form__switch-link">Войти</nuxt-link>
         </p>
       </div>
+    </div>
     </div>
   </main>
 </template>
 
 <script setup lang="ts">
-<<<<<<< HEAD
-// TODO: Link everything to the backend when it's ready
-=======
 import { ref } from "vue";
 import { useAuth } from "~~/composables/useAuth";
 import {useAuthStore} from "~~/stores/auth";
@@ -178,7 +173,7 @@ const onSubmit = async () => {
       phone: phone.value,
       password: password.value,
     };
-    const res = await registerUser(dto);
+    const res = await registerUser(dto as any);
 
     if (res?.tokens.accessToken)
     {
@@ -192,7 +187,6 @@ const onSubmit = async () => {
     alert("Чет ошибка какая-то");
   }
 };
->>>>>>> origin/main
 </script>
 
 <style scoped lang="scss">

@@ -1,20 +1,20 @@
 # Используем официальный Node.js образ как базовый (версия 20 для совместимости с unplugin-utils)
-FROM node:20-alpine
+FROM node:20.14-alpine
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
 # Копируем файлы зависимостей
-COPY package.json ./
+COPY package.json yarn.lock ./
 
 # Устанавливаем зависимости
-RUN yarn install
+RUN npm install
 
 # Копируем исходный код
 COPY . .
 
 # Собираем приложение для продакшена
-RUN yarn build
+RUN npm install
 
 # Открываем порт 8080
 EXPOSE 8080

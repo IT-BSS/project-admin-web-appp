@@ -7,7 +7,7 @@ export const useApi = () => {
 
   const getUsers = async (): Promise<Users[]> => {
     try {
-      const { data } = await axios.get<Users[]>(`${baseUrl}/api/users`);
+      const { data } = await axios.get<Users[]>(`${baseUrl}/api/get_all_users`);
       return data;
     } catch (e) {
       console.log("Ошибка при получении пользователей -", e);

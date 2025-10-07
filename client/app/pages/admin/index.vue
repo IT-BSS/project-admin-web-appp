@@ -35,7 +35,7 @@ const currentComponent = computed(() => {
     organizations: OrganizationsPanel,
     managers: ManagersPanel,
   };
-  return components[activeTab.value] || ManagersPanel;
+  return (components as any)[activeTab.value] || ManagersPanel;
 });
 
 onMounted(async () => {

@@ -3,11 +3,14 @@ import type { Users } from "../types/users";
 
 export interface UserForm {
   guid?: string;
-  fio: string;
-  birth_date: string;
+  name: string;
+  surname: string;
+  middlename: string;
+  birthDate: string;
   email: string;
-  phone: string;
-  password: string;
+  phone?: string;
+  password?: string;
+  passportData?: string;
   role: string; // 'user', 'manager', 'admin'
 }
 
@@ -20,6 +23,8 @@ export const useApiUsersStore = defineStore("apiUsers", {
 
   getters: {
     selectedUser(state): Users | undefined {
+      console.log("HERE:::::");
+      console.log(state.users);
       return state.users.find((u) => u.guid === state.selectedUserId);
     },
 
@@ -27,8 +32,8 @@ export const useApiUsersStore = defineStore("apiUsers", {
     selectedUserRole(state): string {
       const user = state.users.find((u) => u.guid === state.selectedUserId);
       if (!user) return "user";
-      if (user.is_admin) return "admin";
-      if (user.is_manager) return "manager";
+      if (user.isAdmin) return "admin";
+      if (user.isManager) return "manager";
       return "user";
     },
   },
@@ -42,7 +47,7 @@ export const useApiUsersStore = defineStore("apiUsers", {
     setUsers(users: Users[]) {
       this.users = users;
       if (users.length > 0 && !this.selectedUserId) {
-        this.selectedUserId = users[0].guid;
+        this.selectedUserId = (users as any)[0].guid;
       }
     },
 
@@ -52,14 +57,24 @@ export const useApiUsersStore = defineStore("apiUsers", {
 
       try {
         const { guid, ...userToCreate } = userData;
+        console.log("CREATION!!!!!!!!!!!!!!!!!!!!!!");
+        console.log({ ...userToCreate });
+        console.log(guid);
 
-        const response = await $fetch(`${baseUrl}/api/users`, {
+        const fd = new FormData();
+        for (const key in userToCreate) {
+          // без "as any" не даёт нормально пройтись по ключам
+          if (userToCreate.hasOwnProperty(key)) fd.append(key, (userToCreate as any)[key]);
+        }
+
+        const response = await $fetch(`${baseUrl}/api/add_user`, {
           method: "POST",
-          body: userToCreate,
+          body: fd,
         });
 
         await this.loadUsers();
         this.isCreatingNew = false;
+
         return response;
       } catch (error: any) {
         console.error("Ошибка при добавлении пользователя:", error);
@@ -78,7 +93,7 @@ export const useApiUsersStore = defineStore("apiUsers", {
         if (!updateData.password) {
           delete updateData.password;
         }
-
+        
         const response = await $fetch(`${baseUrl}/api/users/${userData.guid}`, {
           method: "PUT",
           body: updateData,
@@ -86,7 +101,7 @@ export const useApiUsersStore = defineStore("apiUsers", {
 
         const index = this.users.findIndex((u) => u.guid === userData.guid);
         if (index !== -1) {
-          this.users[index] = { ...this.users[index], ...response };
+          this.users[index] = { ...this.users[index], ...(response as any) };
         }
 
         return response;
@@ -108,7 +123,7 @@ export const useApiUsersStore = defineStore("apiUsers", {
         this.users = this.users.filter((u) => u.guid !== guid);
 
         if (this.selectedUserId === guid) {
-          this.selectedUserId = this.users.length > 0 ? this.users[0].guid : "";
+          this.selectedUserId = this.users.length > 0 ? (this.users as any)[0].guid : "";
         }
       } catch (error: any) {
         console.error("Ошибка при удалении пользователя:", error);
@@ -121,8 +136,8 @@ export const useApiUsersStore = defineStore("apiUsers", {
       const baseUrl = config.public.apiBaseUrl;
 
       try {
-        const users = await $fetch(`${baseUrl}/api/users`);
-        this.setUsers(users);
+        const users = await $fetch(`${baseUrl}/api/get_all_users`);
+        this.setUsers((users as any).result);
       } catch (error) {
         console.error("Ошибка при загрузке пользователей:", error);
         throw error;
@@ -137,14 +152,14 @@ export const useApiUsersStore = defineStore("apiUsers", {
     cancelCreating() {
       this.isCreatingNew = false;
       if (this.users.length > 0) {
-        this.selectedUserId = this.users[0].guid;
+        this.selectedUserId = (this.users as any)[0].guid;
       }
     },
 
     // Вспомогательный метод для определения роли пользователя
     getUserRole(user: Users): string {
-      if (user.is_admin) return "admin";
-      if (user.is_manager) return "manager";
+      if (user.isAdmin) return "admin";
+      if (user.isManager) return "manager";
       return "user";
     },
   },

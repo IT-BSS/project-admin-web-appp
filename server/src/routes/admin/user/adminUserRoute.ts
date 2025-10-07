@@ -16,10 +16,14 @@ router.route('/get_all_users')
 
 router.route('/add_user')
     .post(upload.none(), asyncHandler(manageUsersController.addUser));
-router.route('/edit_user')
-    .post(upload.none(), asyncHandler(manageUsersController.editUser));
+    
+router.route('/users/:id')
+    .put(upload.none(), asyncHandler(manageUsersController.editUser));
 
 router.route('/ban_user')
     .post(upload.none(), asyncHandler(manageUsersController.banUser));
     
+router.route('/users/:id')
+    .delete(upload.none(), asyncHandler(manageUsersController.deleteUser));
+
 export { router as adminUserRouter };

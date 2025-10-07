@@ -11,7 +11,7 @@
           @click="store.selectUser(user.guid)"
         >
           <div class="user-item">
-            <span class="user-name">{{ user.fio }}</span>
+            <span class="user-name">{{ (user as any).name }}</span>
             <span class="user-role" :class="getRoleClass(user)">{{
               getRoleText(user)
             }}</span>
@@ -31,12 +31,24 @@
       </h2>
       <form @submit.prevent="saveUser">
         <label>
-          ФИО:
-          <input v-model="form.fio" required />
+          Имя
+          <input v-model="(form as any).name" required />
+        </label>
+        <label>
+          Фамилия
+          <input v-model="(form as any).surname" required />
+        </label>
+        <label>
+          Отчество
+          <input v-model="(form as any).middlename" required />
+        </label>
+        <label>
+          Логин
+          <input v-model="(form as any).login" required />
         </label>
         <label>
           Дата рождения:
-          <input type="date" v-model="form.birth_date" />
+          <input type="date" v-model="(form as any).birthDate" />
         </label>
         <label>
           E-mail:
@@ -45,6 +57,10 @@
         <label>
           Телефон:
           <input v-model="form.phone" />
+        </label>
+        <label>
+          Паспортные данные
+          <input v-model="(form as any).passportData" required />
         </label>
         <label>
           Роль:
@@ -109,12 +125,18 @@ const store = useApiUsersStore();
 // Инициализируем форму
 const form = reactive({
   guid: "",
-  fio: "",
-  birth_date: "",
+  name: "",
+  surname: "",
+  middlename: "",
+  login: "",
+  birthDate: "",
   email: "",
   phone: "",
+  passportData: "",
   password: "",
-  role: "user",
+  isAdmin: false,
+  isManager: false,
+  role: ""
 });
 
 // Наблюдаем за изменениями выбранного пользователя
@@ -124,10 +146,14 @@ watch(
     if (user && !store.isCreatingNew) {
       Object.assign(form, {
         guid: user.guid,
-        fio: user.fio,
-        birth_date: user.birth_date ? formatDateForInput(user.birth_date) : "",
+        name: user.name,
+        surname: user.surname,
+        middlename: user.middlename,
+        login: user.login,
+        birthDate: user.birthDate ? formatDateForInput(user.birthDate) : "",
         email: user.email || "",
         phone: user.phone || "",
+        passportData: user.passportData || "",
         password: "", // Пароль не показываем при редактировании
         role: store.getUserRole(user),
       });
@@ -144,11 +170,14 @@ watch(
       // Сбрасываем форму для нового пользователя
       Object.assign(form, {
         guid: "",
-        fio: "",
-        birth_date: "",
+        name: "",
+        surname: "",
+        middlename: "",
+        birthDate: "",
         email: "",
         phone: "",
         password: "",
+        passportData: "",
         role: "user",
       });
     }
@@ -159,19 +188,20 @@ watch(
 function formatDateForInput(date: Date | string): string {
   if (!date) return "";
   const d = new Date(date);
-  return d.toISOString().split("T")[0];
+  if (typeof(date) === "string") date.replaceAll(".", "-"); // иначе d.toISOString() кинет исключение
+  return (d.toISOString().split("T")[0]) as string;
 }
 
 // Функции для отображения ролей в списке
 function getRoleText(user: Users): string {
-  if (user.is_admin) return "Админ";
-  if (user.is_manager) return "Менеджер";
+  if (user.isAdmin) return "Админ";
+  if (user.isManager) return "Менеджер";
   return "Пользователь";
 }
 
 function getRoleClass(user: Users): string {
-  if (user.is_admin) return "role-admin";
-  if (user.is_manager) return "role-manager";
+  if (user.isAdmin) return "role-admin";
+  if (user.isManager) return "role-manager";
   return "role-user";
 }
 

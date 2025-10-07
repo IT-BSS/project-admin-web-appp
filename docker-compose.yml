@@ -2,14 +2,13 @@ services:
   postgres:
     image: postgres:15
     environment:
-
-      POSTGRES_USER: bss_user
-      POSTGRES_PASSWORD: bss_password
-      POSTGRES_DB: bss_database
+      - POSTGRES_USER: postgres
+      - POSTGRES_PASSWORD: admin
+      - POSTGRES_DB: webapp
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U bss_user -d bss_database"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d webapp"]
       interval: 5s
       timeout: 5s
       retries: 5
