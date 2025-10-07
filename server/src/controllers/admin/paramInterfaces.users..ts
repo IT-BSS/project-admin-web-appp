@@ -17,7 +17,8 @@ export interface AddUserBody {
   login: string,
   phone: string,
   password: string,
-  passportData: string
+  passportData: string,
+  role: string
 }
 
 export interface EditUserBody {
@@ -30,10 +31,21 @@ export interface EditUserBody {
   login: string,
   phone: string,
   password: string,
-  passportData: string
+  passportData: string,
+  role: string,
 }
 
 export interface BanUserBody
+{
+  id: string;
+}
+
+export interface DeleteUserParams 
+{
+  id: string;
+}
+
+export interface EditUserParams 
 {
   id: string;
 }

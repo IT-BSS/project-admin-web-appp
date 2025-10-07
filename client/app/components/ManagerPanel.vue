@@ -215,7 +215,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const emit = defineEmits(['refresh']);
+const emit = defineEmits(['refresh', 'page-changed']);
 
 const selectedUserIndex = ref<number | null>(null)
 const currentPage = ref(1)
@@ -266,7 +266,7 @@ watch(selectedUser, (newUser) => {
 }, { immediate: true });
 
 function getFullName(user: User): string {
-  return `${user.surname} ${user.name} ${user.middlename}`.trim();
+  return `${user.surname} ${user.name} ${user.middlename ?? ""}`.trim();
 }
 
 function selectManager(index: number) {

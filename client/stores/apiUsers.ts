@@ -3,11 +3,14 @@ import type { Users } from "../types/users";
 
 export interface UserForm {
   guid?: string;
-  fio: string;
-  birth_date: string;
+  name: string;
+  surname: string;
+  middlename: string;
+  birthDate: string;
   email: string;
   phone?: string;
   password?: string;
+  passportData?: string;
   role: string; // 'user', 'manager', 'admin'
 }
 
@@ -29,8 +32,8 @@ export const useApiUsersStore = defineStore("apiUsers", {
     selectedUserRole(state): string {
       const user = state.users.find((u) => u.guid === state.selectedUserId);
       if (!user) return "user";
-      if (user.is_admin) return "admin";
-      if (user.is_manager) return "manager";
+      if (user.isAdmin) return "admin";
+      if (user.isManager) return "manager";
       return "user";
     },
   },
@@ -54,14 +57,24 @@ export const useApiUsersStore = defineStore("apiUsers", {
 
       try {
         const { guid, ...userToCreate } = userData;
+        console.log("CREATION!!!!!!!!!!!!!!!!!!!!!!");
+        console.log({ ...userToCreate });
+        console.log(guid);
 
-        const response = await $fetch(`${baseUrl}/api/get_all_users`, {
+        const fd = new FormData();
+        for (const key in userToCreate) {
+          // без "as any" не даёт нормально пройтись по ключам
+          if (userToCreate.hasOwnProperty(key)) fd.append(key, (userToCreate as any)[key]);
+        }
+
+        const response = await $fetch(`${baseUrl}/api/add_user`, {
           method: "POST",
-          body: userToCreate,
+          body: fd,
         });
 
         await this.loadUsers();
         this.isCreatingNew = false;
+
         return response;
       } catch (error: any) {
         console.error("Ошибка при добавлении пользователя:", error);
@@ -80,7 +93,7 @@ export const useApiUsersStore = defineStore("apiUsers", {
         if (!updateData.password) {
           delete updateData.password;
         }
-
+        
         const response = await $fetch(`${baseUrl}/api/users/${userData.guid}`, {
           method: "PUT",
           body: updateData,
@@ -123,8 +136,8 @@ export const useApiUsersStore = defineStore("apiUsers", {
       const baseUrl = config.public.apiBaseUrl;
 
       try {
-        const users = await $fetch(`${baseUrl}/api/get_all_   users`);
-        this.setUsers(users as any);
+        const users = await $fetch(`${baseUrl}/api/get_all_users`);
+        this.setUsers((users as any).result);
       } catch (error) {
         console.error("Ошибка при загрузке пользователей:", error);
         throw error;
@@ -145,8 +158,8 @@ export const useApiUsersStore = defineStore("apiUsers", {
 
     // Вспомогательный метод для определения роли пользователя
     getUserRole(user: Users): string {
-      if (user.is_admin) return "admin";
-      if (user.is_manager) return "manager";
+      if (user.isAdmin) return "admin";
+      if (user.isManager) return "manager";
       return "user";
     },
   },

@@ -5,7 +5,8 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import { adminUserRouter } from './routes/admin/user/adminUserRoute';
-import { organizationRoute } from './routes/admin/user/organizationRoute'
+import { organizationRoute } from './routes/admin/organization/organizationRoute'
+
 //import { httpLogStream } from './deprecated/utils/logger';
 
 const app: Express = express();
@@ -14,6 +15,7 @@ const app: Express = express();
 const userRoute = require('./routes/auth/user.route')
 */
 
+app.options('*', cors()); // отвечаем на preflight для всяких PUT/DELETE
 // Позволяет запросам с использованием куков отправлять куки обратно на сервер
 app.use(cors({ 
     origin: ['http://localhost:3000', 'http://localhost:8080'],

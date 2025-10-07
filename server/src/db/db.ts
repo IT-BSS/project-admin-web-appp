@@ -1,6 +1,5 @@
 import { Sequelize } from "sequelize";
 
-<<<<<<< HEAD
 // Получаем параметры подключения из переменных окружения
 const dbName = process.env.DB_NAME || "webapp";
 const dbUser = process.env.DB_USER || "postgres";
@@ -10,7 +9,7 @@ const dbPort = process.env.DB_PORT || 5432;
 
 const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
   host: dbHost,
-  port: dbPort,
+  port: dbPort as number,
   dialect: "postgres",
   logging: process.env.NODE_ENV === 'development' ? console.log : false,
   pool: {
@@ -27,19 +26,6 @@ const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
     max: 3, // Количество попыток переподключения
   },
 });
-=======
-const sequelize = new Sequelize(
-  "postgres",
-  "postgres",
-  "qwer4123",
-  {
-    host: "localhost",
-    port: 5432,
-    dialect: "postgres",
-    logging: false, // убрать SQL в консоли
-  }
-);
->>>>>>> origin/dev_egor
 
 (async () => {
   try {
@@ -56,8 +42,6 @@ const sequelize = new Sequelize(
 })();
 
 export default sequelize;
-<<<<<<< HEAD
-=======
 
 // import { Sequelize } from "sequelize";
 
@@ -83,4 +67,3 @@ export default sequelize;
 // })();
 
 // export default sequelize;
->>>>>>> origin/dev_egor

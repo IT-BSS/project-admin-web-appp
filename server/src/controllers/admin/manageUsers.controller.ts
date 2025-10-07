@@ -5,7 +5,10 @@ import type {
   GetAllUsersQuery, 
   AddUserBody,
   EditUserBody,
-  BanUserBody } from './paramInterfaces.users.';
+  BanUserBody,
+  DeleteUserParams,
+  EditUserParams
+} from './paramInterfaces.users.';
 
 export async function getAllUsers(req: Request<{}, {}, {}, GetAllUsersQuery>, res: Response) {
   try {
@@ -100,7 +103,17 @@ export async function addUser(req: Request<{}, {}, AddUserBody, {}>, res: Respon
         birthDate, 
         email, login, phone, 
         password, 
-        passportData } = req.body;
+        passportData, role } = req.body;
+
+        console.log(name);
+        console.log(surname);
+        console.log(birthDate);
+        console.log(middlename);
+        console.log(email);
+        console.log(login);
+        console.log(phone);
+        console.log(password);
+        console.log(passportData);
 
         if (!name)          return res.status(400).json({ error: "Необходимо имя пользователя." });
         if (!surname)       return res.status(400).json({ error: "Необходима фамилия пользователя." });
@@ -111,9 +124,9 @@ export async function addUser(req: Request<{}, {}, AddUserBody, {}>, res: Respon
         if (!password)      return res.status(400).json({ error: "Необходим пароль пользователя." });
         if (!phone)         return res.status(400).json({ error: "Необходим телефон пользователя." });
         if (!passportData)  return res.status(400).json({ error: "Необходимы паспортные данные пользователя." });
-
+        
         let passwordHash = password; // TODO TOP PRIORITY - implement hash function
-        let isBanned = false, isManager = false, isAdmin = false;
+        let isBanned = false, isManager = role === "manager", isAdmin = role === "admin";
         let user: User = await User.create({
           name, surname, middlename, 
           birthDate, 
@@ -133,14 +146,16 @@ export async function addUser(req: Request<{}, {}, AddUserBody, {}>, res: Respon
   }
 }
 
-export async function editUser(req: Request<{}, {}, EditUserBody, {}>, res: Response) {
+export async function editUser(req: Request<EditUserParams, {}, EditUserBody, {}>, res: Response) {
   try {
-    const { id, name, surname, middlename, 
+    const { id } = req.params;
+    const { name, surname, middlename, 
         birthDate, 
         email, login, phone, 
         password, 
-        passportData } = req.body;
-
+        passportData, role } = req.body;
+    
+    console.log("ID!!!!!!!!!!!!!!!!!!!!!!!!!: ", id);
     // Так как какие-то поля могут быть пустыми в теле запроса (т.е их не нужно обновлять),
     // было решено найти пользователя по GUID и каждое поле обновлять отдельно, если оно есть,
     // вместо того, чтобы пользоваться User.update(...).
@@ -156,8 +171,46 @@ export async function editUser(req: Request<{}, {}, EditUserBody, {}>, res: Resp
     if (login) user.login = login;
     if (phone) user.phone = phone;
     if (password) user.passwordHash = password; // TODO TOP-PRIORITY - написать функцию хэширования пароля
+    if (passportData) user.passportData = passportData;
+    
+    switch (role) {
+      case "user":
+        user.isAdmin = false;
+        user.isManager = false;
+        break;
+      case "manager":
+        user.isManager = true;
+        user.isAdmin = false;
+        break;
+      case "admin":
+        user.isManager = false;
+        user.isAdmin = true;
+        break;
+    }
+
+    await user.save();
   } catch (error: any) {
     console.error("Ошибка при обработке запроса на изменение данных пользователя: ", error);
     res.status(500).json({ error: "Сервер недоступен. "});
+  }
+}
+
+export async function deleteUser(req: Request<DeleteUserParams>, res: Response) {
+  try {
+    const id = req.params.id;
+
+    if (!id) return res.status(400).json({ error: "Необходим ID пользователя." })
+
+    let user: User | null = await User.findOne({ where: { guid: id } });
+
+    if (!user) return res.status(404).json({ error: "Пользователь с указанным ID не найден. "});
+
+    await user.destroy();
+    
+    res.status(200).json({ success: true });
+
+  } catch (error: any) {
+    console.error("Ошибка при обработке запроса на изменение данных пользователя: ", error);
+    res.status(500).json({ error: "Сервер недоступен." });
   }
 }
