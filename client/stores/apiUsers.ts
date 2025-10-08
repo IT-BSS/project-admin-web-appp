@@ -1,5 +1,6 @@
 import { defineStore } from "pinia";
 import type { Users } from "../types/users";
+import { useApi } from "../composables/useApi";
 
 export interface UserForm {
   guid?: string;
@@ -61,10 +62,24 @@ export const useApiUsersStore = defineStore("apiUsers", {
         console.log({ ...userToCreate });
         console.log(guid);
 
+        // Преобразуем role в isAdmin/isManager
+        const processedData = { ...userToCreate } as any;
+        if (processedData.role === 'admin') {
+          processedData.isAdmin = true;
+          processedData.isManager = false;
+        } else if (processedData.role === 'manager') {
+          processedData.isAdmin = false;
+          processedData.isManager = true;
+        } else {
+          processedData.isAdmin = false;
+          processedData.isManager = false;
+        }
+        delete processedData.role;
+
         const fd = new FormData();
-        for (const key in userToCreate) {
+        for (const key in processedData) {
           // без "as any" не даёт нормально пройтись по ключам
-          if (userToCreate.hasOwnProperty(key)) fd.append(key, (userToCreate as any)[key]);
+          if (processedData.hasOwnProperty(key)) fd.append(key, (processedData as any)[key]);
         }
 
         const response = await $fetch(`${baseUrl}/api/add_user`, {
@@ -158,6 +173,26 @@ export const useApiUsersStore = defineStore("apiUsers", {
       this.isCreatingNew = false;
       if (this.users.length > 0) {
         this.selectedUserId = (this.users as any)[0].guid;
+      }
+    },
+
+    async banUser(guid: string) {
+      const { banUser } = useApi();
+      try {
+        await banUser(guid);
+      } catch (error) {
+        console.error("Ошибка при блокировке пользователя:", error);
+        throw error;
+      }
+    },
+
+    async unbanUser(guid: string) {
+      const { unbanUser } = useApi();
+      try {
+        await unbanUser(guid);
+      } catch (error) {
+        console.error("Ошибка при разблокировке пользователя:", error);
+        throw error;
       }
     },
 

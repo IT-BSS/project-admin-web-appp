@@ -210,8 +210,8 @@ function getRoleClass(user: Users): string {
 
 async function saveUser() {
   try {
-    // Преобразуем role в isAdmin/isManager
     const dataToSend = { ...form };
+<<<<<<< HEAD
     if (dataToSend.role === 'admin') {
       dataToSend.isAdmin = true;
       dataToSend.isManager = false;
@@ -227,11 +227,14 @@ async function saveUser() {
     console.log("DATA TO SEND");
     console.log(dataToSend);
     console.log(store.isCreatingNew);
+=======
+
+>>>>>>> origin/dev_egor
     if (store.isCreatingNew) {
-      // Создание нового пользователя
+      // Создание нового пользователя - передаем role
       await store.addUser(dataToSend);
     } else {
-      // Редактирование существующего пользователя
+      // Редактирование существующего пользователя - передаем role
       await store.updateUser(dataToSend);
     }
   } catch (error: any) {

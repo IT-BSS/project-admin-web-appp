@@ -24,14 +24,24 @@ import { useApiOrganization } from "~~/composables/useOgranization";
 import type { Users } from "../../../types/users";
 import type { Organization } from "~~/types/organization";
 
+interface UsersResponse {
+  result: Users[];
+  pagination?: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 const activeTab = ref("managers");
 
 const onSelect = (tab: any) => {
   activeTab.value = tab;
 };
 
-const { getUsers } = useApi();
-const users = ref<Users[]>([]);
+const { getUsers, getManagers } = useApi();
+const users = ref<UsersResponse>({ result: [] });
 
 const { getOrganization } = useApiOrganization();
 const organizations = ref<Organization[]>([]);
@@ -49,7 +59,9 @@ const currentComponent = computed(() => {
 
 onMounted(async () => {
   try {
-    users.value = await getUsers();
+    if (activeTab.value === "managers") {
+      users.value = await getManagers();
+    }
     const response = await getOrganization();
     organizations.value = (response as any).result || response;
     console.log("Пользователи загружены:", users.value);
@@ -59,13 +71,19 @@ onMounted(async () => {
   }
 });
 
-// Загружаем пользователей при переключении на вкладку пользователей
+// Загружаем пользователей при переключении на вкладку пользователей или менеджеров
 watch(activeTab, async (newTab) => {
   if (newTab === "users") {
     try {
       await apiUsersStore.loadUsers();
     } catch (error) {
       console.error("Ошибка при загрузке пользователей:", error);
+    }
+  } else if (newTab === "managers") {
+    try {
+      users.value = await getManagers();
+    } catch (error) {
+      console.error("Ошибка при загрузке менеджеров:", error);
     }
   }
 });
