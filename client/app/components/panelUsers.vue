@@ -2,7 +2,9 @@
   <div class="users-container">
     <!-- Список пользователей -->
     <div class="users-list">
-      <h2>Пользователи</h2>
+      <h2 style="font-size: 32px; font-weight: 600; color: #1a1a1a">
+        Пользователи
+      </h2>
       <ul v-if="store.users && store.users.length">
         <li
           v-for="user in store.users"
@@ -136,7 +138,7 @@ const form = reactive({
   password: "",
   isAdmin: false,
   isManager: false,
-  role: ""
+  role: "",
 });
 
 // Наблюдаем за изменениями выбранного пользователя
@@ -189,8 +191,8 @@ watch(
 function formatDateForInput(date: Date | string): string {
   if (!date) return "";
   const d = new Date(date);
-  if (typeof(date) === "string") date.replaceAll(".", "-"); // иначе d.toISOString() кинет исключение
-  return (d.toISOString().split("T")[0]) as string;
+  if (typeof date === "string") date.replaceAll(".", "-"); // иначе d.toISOString() кинет исключение
+  return d.toISOString().split("T")[0] as string;
 }
 
 // Функции для отображения ролей в списке
@@ -245,8 +247,12 @@ function cancelCreate() {
 </script>
 
 <style scoped>
+* {
+  font-family: Inter;
+}
 .users-container {
   display: flex;
+  flex-direction: column;
   gap: 20px;
   padding: 20px;
   font-family: sans-serif;
@@ -254,10 +260,12 @@ function cancelCreate() {
 
 .users-list {
   flex: 1;
-  border: 1px solid #ccc;
+  border-radius: 12px;
   padding: 15px;
   border-radius: 6px;
-  min-height: 500px;
+  min-height: 300px;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .users-list h2 {
@@ -329,26 +337,30 @@ function cancelCreate() {
 
 .add-btn {
   display: block;
-  width: 100%;
+  width: 15%;
   padding: 8px;
   border: none;
-  background: #28a745;
+  background-image: linear-gradient(-90deg, #3a6ce9, #618eff);
   color: white;
   border-radius: 4px;
   cursor: pointer;
   margin-top: 10px;
+  transition: 1s;
 }
 
 .add-btn:hover {
-  background: #218838;
+  background-image: linear-gradient(-90deg, #618eff, #3a6ce9);
+  transition: 1s;
 }
 
 .user-form {
   flex: 2;
-  border: 1px solid #ccc;
+  background-image: linear-gradient(0deg, #3a6ce9, #618eff);
+  /* border: 1px solid #ccc; */
   padding: 15px;
   border-radius: 6px;
   min-height: 500px;
+  color: white;
 }
 
 .user-form h2 {

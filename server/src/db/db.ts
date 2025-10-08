@@ -1,9 +1,9 @@
 import { Sequelize } from "sequelize";
 
 // Получаем параметры подключения из переменных окружения
-const dbName = process.env.DB_NAME || "webapp";
-const dbUser = process.env.DB_USER || "postgres";
-const dbPassword = process.env.DB_PASSWORD || "admin";
+const dbName = process.env.DB_NAME || "bss_database";
+const dbUser = process.env.DB_USER || "bss_user";
+const dbPassword = process.env.DB_PASSWORD || "bss_password";
 const dbHost = process.env.DB_HOST || "localhost";
 const dbPort = process.env.DB_PORT || 5432;
 
@@ -11,7 +11,7 @@ const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
   host: dbHost,
   port: dbPort as number,
   dialect: "postgres",
-  logging: process.env.NODE_ENV === 'development' ? console.log : false,
+  logging: process.env.NODE_ENV === "development" ? console.log : false,
   pool: {
     max: 5,
     min: 0,
@@ -35,7 +35,7 @@ const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
   } catch (error) {
     console.error("Couldn't connect to database:", error);
     // В продакшене можно добавить логику graceful shutdown
-    if (process.env.NODE_ENV === 'production') {
+    if (process.env.NODE_ENV === "production") {
       process.exit(1);
     }
   }
@@ -46,9 +46,9 @@ export default sequelize;
 // import { Sequelize } from "sequelize";
 
 // const sequelize = new Sequelize(
-//   "webapp",   
-//   "postgres",     
-//   "admin",   
+//   "webapp",
+//   "postgres",
+//   "admin",
 //   {
 //     host: "localhost",
 //     port: 5432,
