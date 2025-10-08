@@ -152,7 +152,10 @@ export async function removeUserFromOrganization(
     try {
         const { id } = req.params; // GUID пользователя
         const { organizationId } = req.body;
-
+        
+        console.log("ID: ", id);
+        console.log("ORG ID: ", organizationId);
+        
         if (!id) return res.status(400).json({ error: "Должен быть предоставлен ID пользователя." });
         if (!organizationId) return res.status(400).json({ error: "Должен быть предоставлен ID организации." });
 

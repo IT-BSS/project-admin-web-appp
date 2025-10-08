@@ -59,11 +59,16 @@ export const useApiOrganization = (): ApiOrganizationReturn => {
 
   const removeUserFromOrganization = async (userData: RemoveUserFromOrganizationData, id: string): Promise<any> => {
     try {
-      const { data } = await axios.delete(
-        `${baseUrl}/api/organizations/`,
-        { data: userData }
+      console.log("USER DATA");
+      console.log(userData);
+      /*const { data } = */await axios.delete(
+        `${baseUrl}/api/organizations/users/${userData.userId}`,
+        { data: {
+          organizationId: userData.organizationId
+        } 
+      }
       );
-      return data;
+      //return data;
     } catch (e) {
       console.log("Ошибка при удалении пользователя из организации -", e);
       throw e;

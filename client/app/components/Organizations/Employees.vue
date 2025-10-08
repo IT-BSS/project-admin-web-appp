@@ -9,15 +9,15 @@
         class="employee-item"
       >
         <div class="employee-info">
-          <div class="employee-name">{{ getUserName(member.id) }}</div>
+          <div class="employee-name">{{ getUserName(member.guid) }}</div>
           <div class="employee-details">
             <span class="employee-role">{{ member.role || 'Сотрудник' }}</span>
-            <span class="employee-email">{{ getUserEmail(member.id) }}</span>
-            <span class="employee-phone">{{ getUserPhone(member.id) }}</span>
+            <span class="employee-email">{{ getUserEmail(member.guid) }}</span>
+            <span class="employee-phone">{{ getUserPhone(member.guid) }}</span>
           </div>
         </div>
         <button
-          @click="removeEmployee(member.id)"
+          @click="removeEmployee(member.guid)"
           class="btn-remove"
         >
           Удалить
@@ -58,22 +58,24 @@ const emit = defineEmits<{
 }>();
 
 const getUserName = (userId: string): string => {
-  const user = props.users.find(u => u.id === userId);
+  const user = props.users.find(u => u.guid === userId);
   return user ? `${user.surname} ${user.name} ${user.middlename}` : 'Неизвестный пользователь';
 };
 
 const getUserEmail = (userId: string): string => {
-  const user = props.users.find(u => u.id === userId);
+  const user = props.users.find(u => u.guid === userId);
   return user ? user.email : '';
 };
 
 const getUserPhone = (userId: string): string => {
-  const user = props.users.find(u => u.id === userId);
+  const user = props.users.find(u => u.guid === userId);
   return user ? user.phone : '';
 };
 
 const removeEmployee = async (userId: string) => {
-  if (!confirm('Вы уверены, что хотите удалить этого сотрудника из организации?')) {
+  console.log("MEMBERS");
+  console.log(props.organization.members);
+  if (!confirm('Вы уверены, что хотите удалить этого сотрудника из организации? ')) {
     return;
   }
 

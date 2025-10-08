@@ -51,7 +51,7 @@ onMounted(async () => {
   try {
     users.value = await getUsers();
     const response = await getOrganization();
-    organizations.value = response.result || response;
+    organizations.value = (response as any).result || response;
     console.log("Пользователи загружены:", users.value);
     console.log("Организации загружены:", organizations.value);
   } catch (e) {
