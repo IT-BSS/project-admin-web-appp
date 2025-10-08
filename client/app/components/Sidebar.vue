@@ -27,18 +27,18 @@
       <span class="sidebar-text" :class="{ active: active === 'organizations' }">Организации</span>
     </div>
 
-    <div
-        class="sidebar-item"
-        :class="{ active: active === 'clusters' }"
-        @click="$emit('select', 'clusters')"
-    >
-      <div class="sidebar-icon" :class="{ active: active === 'clusters' }">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-      <span class="sidebar-text" :class="{ active: active === 'clusters' }">Кластеры</span>
-    </div>
+<!--    <div-->
+<!--        class="sidebar-item"-->
+<!--        :class="{ active: active === 'clusters' }"-->
+<!--        @click="$emit('select', 'clusters')"-->
+<!--    >-->
+<!--      <div class="sidebar-icon" :class="{ active: active === 'clusters' }">-->
+<!--        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">-->
+<!--          <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>-->
+<!--        </svg>-->
+<!--      </div>-->
+<!--      <span class="sidebar-text" :class="{ active: active === 'clusters' }">Кластеры</span>-->
+<!--    </div>-->
 
     <div
         class="sidebar-item"

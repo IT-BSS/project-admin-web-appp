@@ -5,14 +5,26 @@ export const useApi = () => {
   const config = useRuntimeConfig();
   const baseUrl = config.public.apiBaseUrl;
 
-  const getUsers = async (): Promise<Users[]> => {
+  const getUsers = async (): Promise<{ result: Users[] }> => {
     try {
       const { data } = await axios.get<any>(`${baseUrl}/api/get_all_users`);
       console.log("GOT SOMETHING");
       console.log(data);
-      return data.result || data;
+      return { result: data.result || data };
     } catch (e) {
       console.log("Ошибка при получении пользователей -", e);
+      throw e;
+    }
+  };
+
+  const getManagers = async (): Promise<{ result: Users[] }> => {
+    try {
+      const { data } = await axios.get<any>(`${baseUrl}/api/get_all_users?role=manager`);
+      console.log("GOT MANAGERS");
+      console.log(data);
+      return { result: data.result || data };
+    } catch (e) {
+      console.log("Ошибка при получении менеджеров -", e);
       throw e;
     }
   };
@@ -53,10 +65,31 @@ export const useApi = () => {
     }
   };
 
+  const banUser = async (guid: string): Promise<void> => {
+    try {
+      await axios.post(`${baseUrl}/api/ban_user`, { id: guid });
+    } catch (e) {
+      console.log("Ошибка при блокировке пользователя -", e);
+      throw e;
+    }
+  };
+
+  const unbanUser = async (guid: string): Promise<void> => {
+    try {
+      await axios.post(`${baseUrl}/api/unban_user`, { id: guid });
+    } catch (e) {
+      console.log("Ошибка при разблокировке пользователя -", e);
+      throw e;
+    }
+  };
+
   return {
     getUsers,
+    getManagers,
     createUser,
     updateUser,
     deleteUser,
+    banUser,
+    unbanUser,
   };
 };

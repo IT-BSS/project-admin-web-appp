@@ -115,6 +115,9 @@
               Отмена
             </button>
           </template>
+          <button @click="deleteUser" class="btn btn-danger">
+            Удалить пользователя
+          </button>
         </div>
 
         <div v-if="saveMessage" class="message" :class="saveMessageType">
@@ -127,19 +130,19 @@
         <h3>Роли пользователя</h3>
         <div class="form-section">
           <div class="form-row">
-            <label>
+            <label class="test">
               <input type="checkbox" v-model="editedUser.isBanned" :disabled="!isEditingRoles" />
               Заблокирован
             </label>
           </div>
           <div class="form-row">
-            <label>
+            <label class="test">
               <input type="checkbox" v-model="editedUser.isManager" :disabled="!isEditingRoles" />
               Менеджер
             </label>
           </div>
           <div class="form-row">
-            <label>
+            <label class="test">
               <input type="checkbox" v-model="editedUser.isAdmin" :disabled="!isEditingRoles" />
               Администратор
             </label>
@@ -182,6 +185,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import axios from 'axios'
+import { useApiUsersStore } from '../../stores/apiUsers'
 
 interface User {
   guid: string;
@@ -202,7 +206,7 @@ interface User {
 
 interface UsersResponse {
   result: User[];
-  pagination: {
+  pagination?: {
     total: number;
     page: number;
     limit: number;
@@ -216,6 +220,8 @@ interface Props {
 
 const props = defineProps<Props>();
 const emit = defineEmits(['refresh', 'page-changed']);
+
+const store = useApiUsersStore();
 
 const selectedUserIndex = ref<number | null>(null)
 const currentPage = ref(1)
@@ -306,14 +312,12 @@ async function saveChanges() {
   saveMessage.value = '';
 
   try {
-    const config = useRuntimeConfig();
-    const baseUrl = config.public.apiBaseUrl;
-
     const payload: any = {
+      guid: editedUser.value.guid,
       name: editedUser.value.name,
       surname: editedUser.value.surname,
       middlename: editedUser.value.middlename,
-      birthday: editedUser.value.birthDate,
+      birthDate: editedUser.value.birthDate,
       email: editedUser.value.email,
       login: editedUser.value.login,
       phone: editedUser.value.phone,
@@ -325,7 +329,7 @@ async function saveChanges() {
       payload.password = editedUser.value.password;
     }
 
-    await axios.post(`${baseUrl}/api/edit_user`, payload);
+    await store.updateUser(payload);
 
     saveMessage.value = 'Изменения успешно сохранены';
     saveMessageType.value = 'success';
@@ -365,18 +369,32 @@ async function saveRoles() {
   rolesMessage.value = '';
 
   try {
-    const config = useRuntimeConfig();
-    const baseUrl = config.public.apiBaseUrl;
-
-    // Если пользователь заблокирован, отправляем запрос на блокировку
-    if (editedUser.value.isBanned && selectedUser.value && !selectedUser.value.isBanned) {
-      await axios.post(`${baseUrl}/api/banuser`, {
-        login: editedUser.value.login
-      });
+    // Если статус блокировки изменился
+    if (editedUser.value.isBanned !== selectedUser.value?.isBanned) {
+      if (editedUser.value.isBanned) {
+        await store.banUser(editedUser.value.guid);
+      } else {
+        await store.unbanUser(editedUser.value.guid);
+      }
     }
 
-    // Для остальных ролей можно использовать edit_user
-    // (предполагается, что API поддерживает обновление ролей через этот эндпоинт)
+    // Обновляем роли
+    const payload: any = {
+      guid: editedUser.value.guid,
+      isManager: editedUser.value.isManager,
+      isAdmin: editedUser.value.isAdmin,
+    };
+
+    // Определяем role на основе флагов
+    if (payload.isAdmin) {
+      payload.role = 'admin';
+    } else if (payload.isManager) {
+      payload.role = 'manager';
+    } else {
+      payload.role = 'user';
+    }
+
+    await store.updateUser(payload);
 
     rolesMessage.value = 'Роли успешно обновлены';
     rolesMessageType.value = 'success';
@@ -390,6 +408,20 @@ async function saveRoles() {
     rolesMessageType.value = 'error';
   } finally {
     isSavingRoles.value = false;
+  }
+}
+
+async function deleteUser() {
+  if (!selectedUser.value) return;
+
+  if (confirm("Вы уверены, что хотите удалить этого менеджера?")) {
+    try {
+      await store.deleteUser(selectedUser.value.guid);
+      emit('refresh');
+    } catch (error) {
+      console.error('Ошибка при удалении менеджера:', error);
+      alert('Ошибка при удалении');
+    }
   }
 }
 </script>
@@ -573,5 +605,24 @@ background: linear-gradient(137deg, #3a6ce9 0%, #618eff 100%)
 .tab-content h3 {
   margin-bottom: 20px;
   color: #333;
+}
+
+.btn{
+  padding: 10px;
+  background-color: white;
+  color: black;
+  border-radius: 8px;
+  border-color: transparent;
+  margin-right: 10px;
+}
+.btn:hover {
+  transition: all 0.3s ease;
+  background-color: #0c36c0;
+  color: white;
+}
+
+.form-row label{
+  display: flex;
+  flex-direction: row;
 }
 </style>

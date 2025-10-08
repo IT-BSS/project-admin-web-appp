@@ -210,25 +210,13 @@ function getRoleClass(user: Users): string {
 
 async function saveUser() {
   try {
-    // Преобразуем role в isAdmin/isManager
     const dataToSend = { ...form };
-    if (dataToSend.role === 'admin') {
-      dataToSend.isAdmin = true;
-      dataToSend.isManager = false;
-    } else if (dataToSend.role === 'manager') {
-      dataToSend.isAdmin = false;
-      dataToSend.isManager = true;
-    } else {
-      dataToSend.isAdmin = false;
-      dataToSend.isManager = false;
-    }
-    delete (dataToSend as any).role;
 
     if (store.isCreatingNew) {
-      // Создание нового пользователя
+      // Создание нового пользователя - передаем role
       await store.addUser(dataToSend);
     } else {
-      // Редактирование существующего пользователя
+      // Редактирование существующего пользователя - передаем role
       await store.updateUser(dataToSend);
     }
   } catch (error: any) {
