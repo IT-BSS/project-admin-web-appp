@@ -58,3 +58,12 @@ export interface AddUserToOrganizationBody
   roleId: string;
   permissions?: string;
 }
+
+export interface RemoveUserFromOrganizationParams 
+{
+  id: string; // GUID пользователя
+}
+export interface RemoveUserFromOrganizationBody 
+{
+  organizationId: string;
+}

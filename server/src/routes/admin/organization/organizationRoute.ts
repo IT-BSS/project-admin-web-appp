@@ -13,5 +13,8 @@ router.route('/organizations')
 
 router.route('/organizations/users')
     .put(upload.none(), asyncHandler(manageOrganizationsController.addUserToOrganization));
-    
+
+router.route('/organizations/users/:id')
+    .delete(upload.none(), asyncHandler(manageOrganizationsController.removeUserFromOrganization));
+
 export { router as organizationRoute };

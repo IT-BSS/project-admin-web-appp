@@ -6,6 +6,7 @@ import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import { adminUserRouter } from './routes/admin/user/adminUserRoute';
 import { organizationRoute } from './routes/admin/organization/organizationRoute'
+import { roleRoute } from './routes/admin/role/roleRoute';
 
 //import { httpLogStream } from './deprecated/utils/logger';
 
@@ -36,6 +37,7 @@ app.use(bodyParser.json());
 
 app.use("/api", adminUserRouter);
 app.use("/api", organizationRoute);
+app.use("/api", roleRoute);
 /*
 app.use('/api', reviews, GetProductFilters)
 app.use('/api', product, catalogRoutes, productsAbout) // Вот тут роут для получение карточек а так же для - каталога и фильтра, а так же пагинации и т.п

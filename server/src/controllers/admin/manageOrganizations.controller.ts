@@ -4,7 +4,7 @@ import { User } from '../../models/user/user.model'
 
 import type { GetAllOrganizationsQuery, GetOrganizationQuery, AddOrganizationBody } from './paramInterfaces.organizations'
 import { Role } from '../../models/role/role.model';
-import type { AddUserToOrganizationBody } from './paramInterfaces.users';
+import type { AddUserToOrganizationBody, RemoveUserFromOrganizationBody, RemoveUserFromOrganizationParams } from './paramInterfaces.users';
 
 export async function getAllOrganizations(req: Request<{}, {}, {}, GetAllOrganizationsQuery>, res: Response) {
     try {
@@ -141,6 +141,32 @@ export async function addUserToOrganization(
         res.status(200).json({ success: true });
     } catch (error: any) {
         console.error("Ошибка при обработке запроса на добавление пользователя в организацию: ", error);
+        res.status(500).json({ error: "Сервер недоступен." });
+    }
+}
+
+export async function removeUserFromOrganization(
+    req: Request<RemoveUserFromOrganizationParams, {}, RemoveUserFromOrganizationBody, {}>,
+    res: Response) 
+{
+    try {
+        const { id } = req.params; // GUID пользователя
+        const { organizationId } = req.body;
+
+        if (!id) return res.status(400).json({ error: "Должен быть предоставлен ID пользователя." });
+        if (!organizationId) return res.status(400).json({ error: "Должен быть предоставлен ID организации." });
+
+        const user = await User.findOne({ where: { guid: id } });
+        if (!user) return res.status(404).json({ error: "Пользователь с указанным ID не найден." });
+
+        const organization = await Organization.findOne({ where: { guid: organizationId } });
+        if (!organization) return res.status(404).json({ error: "Организация с указанным ID не найдена." });
+
+        await user.removeOrganization(organization);
+
+        res.status(200).json({ success: true });
+    } catch (error: any) {
+        console.error("Ошибка при обработке запроса на удаление пользователя из организации: ", error);
         res.status(500).json({ error: "Сервер недоступен." });
     }
 }

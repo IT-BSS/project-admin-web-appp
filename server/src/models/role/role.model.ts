@@ -1,13 +1,16 @@
-import { Model, DataTypes } from "sequelize";
+import { Model, DataTypes, type Optional } from "sequelize";
 import sequelize from "../../db/db";
 
+// говорим, что id и guid необязательны при создании
 interface RoleAttributes {
   id: number;
   guid: string;
   name: string;
 }
 
-export class Role extends Model<RoleAttributes> implements RoleAttributes {
+interface RoleCreationAttributes extends Optional<RoleAttributes, "id" | "guid"> {}
+
+export class Role extends Model<RoleAttributes, RoleCreationAttributes> implements RoleAttributes {
   declare id: number;
   declare guid: string;
   declare name: string;

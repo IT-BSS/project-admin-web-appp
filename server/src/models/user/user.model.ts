@@ -75,6 +75,10 @@ export class User extends Model<UserCreationAttributes>
     organizations: (Organization | number)[],
     options?: { through: Partial<UserOrganizationRole> }
   ) => Promise<void>;
+
+  declare removeOrganization: (
+    organization: Organization | number
+  ) => Promise<void>;
 }
 
 User.init(
