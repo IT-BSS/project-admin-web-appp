@@ -24,9 +24,9 @@ UserOrganizationRole.init(
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     guid: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, allowNull: false, unique: true },
-    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: "Users", key: "id" } },
-    organizationId: { type: DataTypes.INTEGER, allowNull: false, references: { model: "Organizations", key: "id" } },
-    roleId: { type: DataTypes.INTEGER, allowNull: false, references: { model: "Roles", key: "id" } },
+    userId: { type: DataTypes.INTEGER, allowNull: false },
+    organizationId: { type: DataTypes.INTEGER, allowNull: false },
+    roleId: { type: DataTypes.INTEGER, allowNull: false },
     permissions: { type: DataTypes.STRING },
   },
   { sequelize, tableName: "UserOrganizationRoles", timestamps: true }

@@ -1,9 +1,9 @@
 {
-  "_hash": "_SwQNNdPhpYE5p2Fnvs-dCtlTllwxmSLksaAusSXtYs",
+  "_hash": "sjsfDCv0k3xpnFoJXBO_QXATaTpIbwwSWrhOHaQt1G8",
   "project": {
-    "rootDir": "D:/weaboo/chikunox-adminka/web-app-v.0.8/project-admin-web-appp/client"
+    "rootDir": "D:/BSC/webapp/client"
   },
   "versions": {
-    "nuxt": "4.1.3"
+    "nuxt": "4.1.2"
   }
 }

@@ -1,9 +1,9 @@
 import { Sequelize } from "sequelize";
 
 // Получаем параметры подключения из переменных окружения
-const dbName = process.env.DB_NAME || "bss_database";
-const dbUser = process.env.DB_USER || "bss_user";
-const dbPassword = process.env.DB_PASSWORD || "bss_password";
+const dbName = process.env.DB_NAME || "webapp";
+const dbUser = process.env.DB_USER || "postgres";
+const dbPassword = process.env.DB_PASSWORD || "admin";
 const dbHost = process.env.DB_HOST || "localhost";
 const dbPort = process.env.DB_PORT || 5432;
 
@@ -29,6 +29,7 @@ const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
 
 (async () => {
   try {
+
     await sequelize.authenticate();
     console.log("Successful connection to database.");
     console.log(`Database: ${dbHost}:${dbPort}/${dbName}`);

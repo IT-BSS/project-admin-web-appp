@@ -1,6 +1,9 @@
 import type { Request, Response } from 'express'
 import { Organization } from '../../models/organization/organization.model'
+import { User } from '../../models/user/user.model'
+
 import type { GetAllOrganizationsQuery, GetOrganizationQuery, AddOrganizationBody } from './paramInterfaces.organizations'
+import { Role } from '../../models/role/role.model';
 
 export async function getAllOrganizations(req: Request<{}, {}, {}, GetAllOrganizationsQuery>, res: Response) {
     try {
@@ -11,7 +14,18 @@ export async function getAllOrganizations(req: Request<{}, {}, {}, GetAllOrganiz
 
         const offset = (page - 1) * limit;
         
-        const { rows: organizations, count } = await Organization.findAndCountAll({ offset, limit });
+        const { rows: organizations, count } = 
+            await Organization.findAndCountAll({
+                 offset, limit,
+                 include: [
+                    {
+                        model: User,
+                        as: "members", // это ДОЛЖНО совпадать с тем, как эта связь обозвана в models/associations.ts
+                        through: { attributes: [ "permissions" ] },
+                        include: [ { model: Role } ]
+                    }
+                 ]
+            });
         
         res.status(200).json({
             result: organizations,
@@ -22,6 +36,7 @@ export async function getAllOrganizations(req: Request<{}, {}, {}, GetAllOrganiz
                 totalPages: Math.ceil(count / limit)
             }
         });
+
     } catch(error: any) {
         console.error('Ошибка при обработке запроса на получение всех организаций:', error);
         res.status(500).json({ error: "Сервер недоступен. "});
@@ -76,7 +91,7 @@ export async function addOrganization(req: Request<{}, {}, AddOrganizationBody, 
         });
 
         res.status(200).json({ id: organization.guid });
-        
+
     } catch (error: any) {
         console.error("Ошибка при обработке запроса на добавление организации: ", error);
         res.status(500).json({ error: "Сервер недоступен." });

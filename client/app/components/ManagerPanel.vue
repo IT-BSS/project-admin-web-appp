@@ -317,7 +317,7 @@ async function saveChanges() {
       email: editedUser.value.email,
       login: editedUser.value.login,
       phone: editedUser.value.phone,
-      passport_data: editedUser.value.passportData,
+      passportData: editedUser.value.passportData,
     };
 
     // Добавляем пароль только если он был введен
