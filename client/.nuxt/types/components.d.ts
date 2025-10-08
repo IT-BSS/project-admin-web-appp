@@ -14,7 +14,9 @@ type HydrationStrategies = {
 type LazyComponent<T> = (T & DefineComponent<HydrationStrategies, {}, {}, {}, {}, {}, {}, { hydrated: () => void }>)
 
 interface _GlobalComponents {
-      'ManagerPanel': typeof import("../../app/components/ManagerPanel.vue")['default']
+      'AddUserToOrganization': typeof import("../../app/components/AddUserToOrganization.vue")['default']
+    'ManagerPanel': typeof import("../../app/components/ManagerPanel.vue")['default']
+    'OrganizationsEmployees': typeof import("../../app/components/Organizations/Employees.vue")['default']
     'OrganizationsForm': typeof import("../../app/components/Organizations/Form.vue")['default']
     'OrganizationsList': typeof import("../../app/components/Organizations/List.vue")['default']
     'OrganizationsTabButton': typeof import("../../app/components/Organizations/TabButton.vue")['default']
@@ -46,7 +48,9 @@ interface _GlobalComponents {
     'Body': typeof import("../../node_modules/nuxt/dist/head/runtime/components")['Body']
     'NuxtIsland': typeof import("../../node_modules/nuxt/dist/app/components/nuxt-island")['default']
     'NuxtRouteAnnouncer': typeof import("../../node_modules/nuxt/dist/app/components/server-placeholder")['default']
-      'LazyManagerPanel': LazyComponent<typeof import("../../app/components/ManagerPanel.vue")['default']>
+      'LazyAddUserToOrganization': LazyComponent<typeof import("../../app/components/AddUserToOrganization.vue")['default']>
+    'LazyManagerPanel': LazyComponent<typeof import("../../app/components/ManagerPanel.vue")['default']>
+    'LazyOrganizationsEmployees': LazyComponent<typeof import("../../app/components/Organizations/Employees.vue")['default']>
     'LazyOrganizationsForm': LazyComponent<typeof import("../../app/components/Organizations/Form.vue")['default']>
     'LazyOrganizationsList': LazyComponent<typeof import("../../app/components/Organizations/List.vue")['default']>
     'LazyOrganizationsTabButton': LazyComponent<typeof import("../../app/components/Organizations/TabButton.vue")['default']>

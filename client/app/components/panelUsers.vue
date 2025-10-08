@@ -181,7 +181,7 @@ watch(
         phone: "",
         password: "",
         passportData: "",
-        role: "user",
+        roleId: "some-user-guid",
       });
     }
   }
@@ -210,12 +210,26 @@ function getRoleClass(user: Users): string {
 
 async function saveUser() {
   try {
+    // Преобразуем role в isAdmin/isManager
+    const dataToSend = { ...form };
+    if (dataToSend.role === 'admin') {
+      dataToSend.isAdmin = true;
+      dataToSend.isManager = false;
+    } else if (dataToSend.role === 'manager') {
+      dataToSend.isAdmin = false;
+      dataToSend.isManager = true;
+    } else {
+      dataToSend.isAdmin = false;
+      dataToSend.isManager = false;
+    }
+    delete (dataToSend as any).role;
+
     if (store.isCreatingNew) {
       // Создание нового пользователя
-      await store.addUser(form);
+      await store.addUser(dataToSend);
     } else {
       // Редактирование существующего пользователя
-      await store.updateUser(form);
+      await store.updateUser(dataToSend);
     }
   } catch (error: any) {
     console.error("Ошибка при сохранении пользователя:", error);

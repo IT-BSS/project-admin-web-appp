@@ -2,9 +2,9 @@
   <div class="org-list">
     <div
         v-for="org in organizations"
-        :key="org.id"
+        :key="org.guid"
         class="org-item"
-        :class="{ active: selectedId === org.id }"
+        :class="{ active: selectedId === org.guid }"
         @click="$emit('select', org)"
     >
       {{ org.name }}
@@ -13,11 +13,11 @@
 </template>
 
 <script setup lang="ts">
-import type { Organization } from "@/../stores/organization";
+import type { Organization } from "@/../types/organization";
 
 defineProps<{
   organizations: Organization[];
-  selectedId?: number | null;
+  selectedId?: string | null;
 }>();
 
 defineEmits<{
