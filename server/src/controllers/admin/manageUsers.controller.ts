@@ -148,7 +148,7 @@ export async function editUser(req: Request<EditUserParams, {}, EditUserBody, {}
         birthDate, 
         email, login, phone, 
         password, 
-        passportData, role } = req.body;
+        passportData, isAdmin, isManager } = req.body;
     
     // Так как какие-то поля могут быть пустыми в теле запроса (т.е их не нужно обновлять),
     // было решено найти пользователя по GUID и каждое поле обновлять отдельно, если оно есть,
@@ -167,7 +167,9 @@ export async function editUser(req: Request<EditUserParams, {}, EditUserBody, {}
     if (password) user.passwordHash = password; // TODO TOP-PRIORITY - написать функцию хэширования пароля
     if (passportData) user.passportData = passportData;
     
-    switch (role) {
+    user.isAdmin = isAdmin;
+    user.isManager = isManager;
+    /*switch (role) {
       case "user":
         user.isAdmin = false;
         user.isManager = false;
@@ -181,8 +183,9 @@ export async function editUser(req: Request<EditUserParams, {}, EditUserBody, {}
         user.isAdmin = true;
         break;
     }
-
+*/
     await user.save();
+    res.status(200).json({ success: true });
   } catch (error: any) {
     console.error("Ошибка при обработке запроса на изменение данных пользователя: ", error);
     res.status(500).json({ error: "Сервер недоступен. "});

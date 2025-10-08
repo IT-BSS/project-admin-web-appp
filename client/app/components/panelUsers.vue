@@ -223,7 +223,10 @@ async function saveUser() {
       dataToSend.isManager = false;
     }
     delete (dataToSend as any).role;
-
+    
+    console.log("DATA TO SEND");
+    console.log(dataToSend);
+    console.log(store.isCreatingNew);
     if (store.isCreatingNew) {
       // Создание нового пользователя
       await store.addUser(dataToSend);

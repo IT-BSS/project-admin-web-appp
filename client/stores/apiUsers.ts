@@ -83,8 +83,9 @@ export const useApiUsersStore = defineStore("apiUsers", {
     },
 
     async updateUser(userData: UserForm) {
+      console.log("HEeerererereeEEE!");
       if (!userData.guid) throw new Error("GUID пользователя не указан");
-
+      
       const config = useRuntimeConfig();
       const baseUrl = config.public.apiBaseUrl;
 
@@ -94,11 +95,15 @@ export const useApiUsersStore = defineStore("apiUsers", {
           delete updateData.password;
         }
         
+        console.log("USER DATA IN UPDATE");
+        console.log(updateData);
+        console.log(`${baseUrl}/api/users/${userData.guid}`);
         const response = await $fetch(`${baseUrl}/api/users/${userData.guid}`, {
           method: "PUT",
           body: updateData,
         });
-
+        
+        console.log("AFTERRRRRRRRRRRRRRRRRRRRRRr");
         const index = this.users.findIndex((u) => u.guid === userData.guid);
         if (index !== -1) {
           this.users[index] = { ...this.users[index], ...(response as any) };

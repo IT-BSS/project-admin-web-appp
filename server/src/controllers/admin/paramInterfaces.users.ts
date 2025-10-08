@@ -33,7 +33,8 @@ export interface EditUserBody {
   phone: string,
   password: string,
   passportData: string,
-  role: string,
+  isAdmin: boolean,
+  isManager: boolean;
 }
 
 export interface BanUserBody
