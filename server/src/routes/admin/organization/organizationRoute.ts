@@ -11,6 +11,9 @@ const router: Router = express.Router();
 router.route('/organizations')
     .get(upload.none(), asyncHandler(manageOrganizationsController.getAllOrganizations));
 
+router.route('/organizations')
+    .post(upload.none(), asyncHandler(manageOrganizationsController.addOrganization));
+    
 router.route('/organizations/users')
     .put(upload.none(), asyncHandler(manageOrganizationsController.addUserToOrganization));
 
