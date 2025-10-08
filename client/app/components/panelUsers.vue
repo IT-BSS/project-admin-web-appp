@@ -173,6 +173,7 @@ watch(
         name: "",
         surname: "",
         middlename: "",
+        login: "",
         birthDate: "",
         email: "",
         phone: "",

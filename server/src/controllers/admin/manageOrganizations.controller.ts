@@ -48,7 +48,14 @@ export async function getOrganization(req: Request<{}, {}, {}, GetOrganizationQu
 
 export async function addOrganization(req: Request<{}, {}, AddOrganizationBody, {}>, res: Response) {
     try {
-        const { name, description, address, phone, email, inn, kpp } = req.body;
+        const { name, 
+            description, 
+            address, 
+            phone, 
+            email, 
+            inn, 
+            kpp 
+        } = req.body;
 
         if (!name)          return res.status(400).json({ error: "Необходимо название организации." });
         if (!description)   return res.status(400).json({ error: "Необходимо описание организации." });
@@ -69,6 +76,7 @@ export async function addOrganization(req: Request<{}, {}, AddOrganizationBody, 
         });
 
         res.status(200).json({ id: organization.guid });
+        
     } catch (error: any) {
         console.error("Ошибка при обработке запроса на добавление организации: ", error);
         res.status(500).json({ error: "Сервер недоступен." });

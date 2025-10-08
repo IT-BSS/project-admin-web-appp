@@ -1,6 +1,7 @@
 export interface GetAllUsersQuery {
     page?: number;
     limit?: number;
+    role?: string;
 }
 
 export interface GetUserQuery {

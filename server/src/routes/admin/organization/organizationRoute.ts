@@ -8,7 +8,7 @@ import upload from "../../../middleware/upload";
 
 const router: Router = express.Router();
 
-router.route('/get_all_organization')
+router.route('/organizations')
     .get(upload.none(), asyncHandler(getAllOrganizations.getAllOrganizations));
 
 

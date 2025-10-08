@@ -8,18 +8,23 @@ import type {
   BanUserBody,
   DeleteUserParams,
   EditUserParams
-} from './paramInterfaces.users.';
+} from './paramInterfaces.users';
 
 export async function getAllUsers(req: Request<{}, {}, {}, GetAllUsersQuery>, res: Response) {
   try {
-    let { page, limit } = req.query;
+    let { page, limit, role } = req.query;
     
     page = page || 1;
     limit = limit || 10;
 
     const offset = (page - 1) * limit;
 
-    const { rows: users, count } = await User.findAndCountAll({ offset, limit });
+    let where: any = {};
+
+    if (role === "manager") where.isManager = true;
+    if (role === "admin") where.isAdmin = true;
+
+    const { rows: users, count } = await User.findAndCountAll({ offset, limit, where });
 
     res.json({
       result: users,
@@ -105,16 +110,6 @@ export async function addUser(req: Request<{}, {}, AddUserBody, {}>, res: Respon
         password, 
         passportData, role } = req.body;
 
-        console.log(name);
-        console.log(surname);
-        console.log(birthDate);
-        console.log(middlename);
-        console.log(email);
-        console.log(login);
-        console.log(phone);
-        console.log(password);
-        console.log(passportData);
-
         if (!name)          return res.status(400).json({ error: "Необходимо имя пользователя." });
         if (!surname)       return res.status(400).json({ error: "Необходима фамилия пользователя." });
         if (!middlename)    return res.status(400).json({ error: "Необходимо отчество пользователя." });
@@ -155,7 +150,6 @@ export async function editUser(req: Request<EditUserParams, {}, EditUserBody, {}
         password, 
         passportData, role } = req.body;
     
-    console.log("ID!!!!!!!!!!!!!!!!!!!!!!!!!: ", id);
     // Так как какие-то поля могут быть пустыми в теле запроса (т.е их не нужно обновлять),
     // было решено найти пользователя по GUID и каждое поле обновлять отдельно, если оно есть,
     // вместо того, чтобы пользоваться User.update(...).
