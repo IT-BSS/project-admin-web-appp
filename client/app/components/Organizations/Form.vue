@@ -6,13 +6,23 @@
     </label>
 
     <label>
+      Описание:
+      <input v-model="localOrg.description" />
+    </label>
+
+    <label>
       Адрес:
-      <input v-model="localOrg.adress" />
+      <input v-model="localOrg.address" />
     </label>
 
     <label>
       ИНН:
-      <input v-model="localOrg.INN" type="number" />
+      <input v-model="localOrg.inn" />
+    </label>
+
+    <label>
+      КПП:
+      <input v-model="localOrg.kpp" />
     </label>
 
     <label>
@@ -31,7 +41,7 @@
 
 <script setup lang="ts">
 import { reactive, watch } from "vue";
-import type { Organization } from "@/../stores/organization";
+import type { Organization } from "~~/types/organization";
 
 const props = defineProps<{
   organization: Organization | null;
@@ -42,15 +52,20 @@ const emit = defineEmits<{
 }>();
 
 const localOrg = reactive<Organization>({
-  id: 0,
+  guid: "",
   name: "",
-  adress: "",
-  INN: 0,
+  description: "",
+  address: "",
+  phone: "",
   email: "",
-  phone: 0
+  inn: "",
+  kpp: "",
+  createdAt: "",
+  updatedAt: "",
+  members: []
 });
 
-// синхронизация, если выбрали другую организацию
+// Синхронизация при изменении выбранной организации
 watch(
     () => props.organization,
     (org) => {

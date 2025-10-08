@@ -7,10 +7,10 @@ export const useApi = () => {
 
   const getUsers = async (): Promise<Users[]> => {
     try {
-      const { data } = await axios.get<Users[]>(`${baseUrl}/api/get_all_users`);
+      const { data } = await axios.get<any>(`${baseUrl}/api/get_all_users`);
       console.log("GOT SOMETHING");
       console.log(data);
-      return data;
+      return data.result || data;
     } catch (e) {
       console.log("Ошибка при получении пользователей -", e);
       throw e;

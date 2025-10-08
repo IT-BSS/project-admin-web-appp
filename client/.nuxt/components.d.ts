@@ -14,7 +14,9 @@ type HydrationStrategies = {
 type LazyComponent<T> = (T & DefineComponent<HydrationStrategies, {}, {}, {}, {}, {}, {}, { hydrated: () => void }>)
 
 
+export const AddUserToOrganization: typeof import("../app/components/AddUserToOrganization.vue")['default']
 export const ManagerPanel: typeof import("../app/components/ManagerPanel.vue")['default']
+export const OrganizationsEmployees: typeof import("../app/components/Organizations/Employees.vue")['default']
 export const OrganizationsForm: typeof import("../app/components/Organizations/Form.vue")['default']
 export const OrganizationsList: typeof import("../app/components/Organizations/List.vue")['default']
 export const OrganizationsTabButton: typeof import("../app/components/Organizations/TabButton.vue")['default']
@@ -46,7 +48,9 @@ export const Html: typeof import("../node_modules/nuxt/dist/head/runtime/compone
 export const Body: typeof import("../node_modules/nuxt/dist/head/runtime/components")['Body']
 export const NuxtIsland: typeof import("../node_modules/nuxt/dist/app/components/nuxt-island")['default']
 export const NuxtRouteAnnouncer: typeof import("../node_modules/nuxt/dist/app/components/server-placeholder")['default']
+export const LazyAddUserToOrganization: LazyComponent<typeof import("../app/components/AddUserToOrganization.vue")['default']>
 export const LazyManagerPanel: LazyComponent<typeof import("../app/components/ManagerPanel.vue")['default']>
+export const LazyOrganizationsEmployees: LazyComponent<typeof import("../app/components/Organizations/Employees.vue")['default']>
 export const LazyOrganizationsForm: LazyComponent<typeof import("../app/components/Organizations/Form.vue")['default']>
 export const LazyOrganizationsList: LazyComponent<typeof import("../app/components/Organizations/List.vue")['default']>
 export const LazyOrganizationsTabButton: LazyComponent<typeof import("../app/components/Organizations/TabButton.vue")['default']>
