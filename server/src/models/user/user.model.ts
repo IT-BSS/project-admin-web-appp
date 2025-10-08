@@ -1,6 +1,8 @@
 import { Model, DataTypes, type Optional } from "sequelize";
 import sequelize from "../../db/db";
 import { access } from "fs";
+import type { Organization } from "../organization/organization.model";
+import type { UserOrganizationRole } from "../userOrganizationRole/userOrganizationRole";
 
 interface UserAttributes {
   id: number;
@@ -23,11 +25,12 @@ interface UserAttributes {
   updatedAt?: Date;
 }
 
-type RealUserAttributes = Optional<UserAttributes,
-  "id" | "guid" | "middlename" | "passportData" | "accessToken" | "refreshToken"
+type UserCreationAttributes = Optional<
+  UserAttributes,
+  "id" | "guid" | "middlename" | "passportData" | "accessToken" | "refreshToken" | "createdAt" | "updatedAt"
 >;
 
-export class User extends Model<RealUserAttributes>
+export class User extends Model<UserCreationAttributes>
   implements UserAttributes {
   declare id: number;
   declare guid: string;
@@ -58,6 +61,20 @@ export class User extends Model<RealUserAttributes>
        
       return values;
   }
+
+  // Методы, автоматически создаваемые Sequelize.
+  // TS их по умолчанию не видит, нужно явно объявить их, это и происходит ниже
+  declare getOrganizations: () => Promise<Organization[]>;
+
+  declare addOrganization: (
+    organization: Organization | number,
+    options?: { through: Partial<UserOrganizationRole> }
+  ) => Promise<void>;
+
+  declare addOrganizations: (
+    organizations: (Organization | number)[],
+    options?: { through: Partial<UserOrganizationRole> }
+  ) => Promise<void>;
 }
 
 User.init(

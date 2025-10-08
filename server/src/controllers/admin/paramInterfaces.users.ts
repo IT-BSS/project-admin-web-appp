@@ -50,3 +50,11 @@ export interface EditUserParams
 {
   id: string;
 }
+
+export interface AddUserToOrganizationBody 
+{
+  userId: string;
+  organizationId: string;
+  roleId: string;
+  permissions?: string;
+}

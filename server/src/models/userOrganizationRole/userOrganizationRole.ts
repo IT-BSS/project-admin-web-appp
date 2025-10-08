@@ -7,7 +7,7 @@ interface UserOrganizationRoleAttributes {
   userId: number;
   organizationId: number;
   roleId: number;
-  permissions?: string | null;
+  permissions?: string;
 }
 
 export class UserOrganizationRole extends Model<UserOrganizationRoleAttributes>
@@ -17,7 +17,7 @@ export class UserOrganizationRole extends Model<UserOrganizationRoleAttributes>
   declare userId: number;
   declare organizationId: number;
   declare roleId: number;
-  declare permissions?: string | null;
+  declare permissions?: string;
 }
 
 UserOrganizationRole.init(
@@ -27,7 +27,7 @@ UserOrganizationRole.init(
     userId: { type: DataTypes.INTEGER, allowNull: false },
     organizationId: { type: DataTypes.INTEGER, allowNull: false },
     roleId: { type: DataTypes.INTEGER, allowNull: false },
-    permissions: { type: DataTypes.STRING },
+    permissions: { type: DataTypes.STRING, allowNull: true },
   },
   { sequelize, tableName: "UserOrganizationRoles", timestamps: true }
 );
