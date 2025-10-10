@@ -15,7 +15,7 @@
             <span class="employee-email">{{ getUserEmail(member.guid) }}</span>
             <span class="employee-phone">{{ getUserPhone(member.guid) }}</span>
           </div>
-        </div>
+        </div> 
         <button
           @click="removeEmployee(member.guid)"
           class="btn-remove"
@@ -58,17 +58,20 @@ const emit = defineEmits<{
 }>();
 
 const getUserName = (userId: string): string => {
-  const user = props.users.find(u => u.guid === userId);
+  console.log("PROPS USERS!!!!");
+  console.log((props.users as any).result);
+  console.log((props.users as any)[0]);
+  const user = (props.users as any).result.find((u: any) => u.guid === userId);
   return user ? `${user.surname} ${user.name} ${user.middlename}` : 'Неизвестный пользователь';
 };
 
 const getUserEmail = (userId: string): string => {
-  const user = props.users.find(u => u.guid === userId);
+  const user = (props.users as any).result.find((u: any) => u.guid === userId);
   return user ? user.email : '';
 };
 
 const getUserPhone = (userId: string): string => {
-  const user = props.users.find(u => u.guid === userId);
+  const user = (props.users as any).result.find((u:any) => u.guid === userId);
   return user ? user.phone : '';
 };
 

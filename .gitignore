@@ -49,3 +49,6 @@ Thumbs.db
 # --- Misc ---
 *.bak
 *.tmp
+
+# --- Nuxt ---
+client/.nuxt/

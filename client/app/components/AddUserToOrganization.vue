@@ -70,7 +70,7 @@ const isError = ref(false);
 // Доступные пользователи (исключая уже добавленных)
 const availableUsers = computed(() => {
   const existingMemberIds = props.organization.members?.map(member => member.id) || [];
-  return props.users;//.filter(user => !existingMemberIds.includes(user.id));
+  return (props.users as any).result;//.filter(user => !existingMemberIds.includes(user.id));
 });
 
 const addUser = async () => {

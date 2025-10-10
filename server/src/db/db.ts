@@ -1,9 +1,9 @@
 import { Sequelize } from "sequelize";
 
 // Получаем параметры подключения из переменных окружения
-const dbName = process.env.DB_NAME || "postgres";
+const dbName = process.env.DB_NAME || "webapp";
 const dbUser = process.env.DB_USER || "postgres";
-const dbPassword = process.env.DB_PASSWORD || "qwer4123";
+const dbPassword = process.env.DB_PASSWORD || "admin";
 const dbHost = process.env.DB_HOST || "localhost";
 const dbPort = process.env.DB_PORT || 5432;
 
