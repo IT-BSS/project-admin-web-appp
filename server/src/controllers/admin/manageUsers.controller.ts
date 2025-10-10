@@ -9,6 +9,7 @@ import type {
   DeleteUserParams,
   EditUserParams
 } from './paramInterfaces.users';
+import { hashPassword } from '../../models/user/hashPassword';
 
 export async function getAllUsers(req: Request<{}, {}, {}, GetAllUsersQuery>, res: Response) {
   try {
@@ -120,7 +121,7 @@ export async function addUser(req: Request<{}, {}, AddUserBody, {}>, res: Respon
         if (!phone)         return res.status(400).json({ error: "Необходим телефон пользователя." });
         if (!passportData)  return res.status(400).json({ error: "Необходимы паспортные данные пользователя." });
         
-        let passwordHash = password; // TODO TOP PRIORITY - implement hash function
+        let passwordHash = await hashPassword(password);
         let isBanned = false, isManager = role === "manager", isAdmin = role === "admin";
         let user: User = await User.create({
           name, surname, middlename, 
@@ -164,26 +165,12 @@ export async function editUser(req: Request<EditUserParams, {}, EditUserBody, {}
     if (email) user.email = email;
     if (login) user.login = login;
     if (phone) user.phone = phone;
-    if (password) user.passwordHash = password; // TODO TOP-PRIORITY - написать функцию хэширования пароля
+    if (password) user.passwordHash = await hashPassword(password);
     if (passportData) user.passportData = passportData;
     
     user.isAdmin = isAdmin;
     user.isManager = isManager;
-    /*switch (role) {
-      case "user":
-        user.isAdmin = false;
-        user.isManager = false;
-        break;
-      case "manager":
-        user.isManager = true;
-        user.isAdmin = false;
-        break;
-      case "admin":
-        user.isManager = false;
-        user.isAdmin = true;
-        break;
-    }
-*/
+
     await user.save();
     res.status(200).json({ success: true });
   } catch (error: any) {

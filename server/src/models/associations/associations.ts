@@ -1,9 +1,12 @@
-import { User } from "./user/user.model";
-import { Organization } from "./organization/organization.model";
-import { Role } from "./role/role.model";
-import { UserOrganizationRole } from "./userOrganizationRole/userOrganizationRole";
+import { User } from "../user/user.model";
+import { Organization } from "../organization/organization.model";
+import { Role } from "../role/role.model";
+import { UserOrganizationRole } from "../userOrganizationRole/userOrganizationRole";
 
 export function setupAssociations() {
+
+  // Пользователи, организации и их должности в организациях
+
   User.belongsToMany(Organization, {
     through: UserOrganizationRole,
     as: "organizations",
@@ -28,7 +31,7 @@ export function setupAssociations() {
     as: "roles",
     foreignKey: "organizationId"
   });
-  
+
   UserOrganizationRole.belongsTo(User, { foreignKey: "userId" });
   UserOrganizationRole.belongsTo(Organization, { foreignKey: "organizationId" });
   UserOrganizationRole.belongsTo(Role, { foreignKey: "roleId" });
@@ -36,4 +39,7 @@ export function setupAssociations() {
   User.hasMany(UserOrganizationRole, { foreignKey: "userId" });
   Organization.hasMany(UserOrganizationRole, { foreignKey: "organizationId" });
   Role.hasMany(UserOrganizationRole, { foreignKey: "roleId" });
+
+   
+
 }

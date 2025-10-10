@@ -1,6 +1,6 @@
 import sequelize from "./db/db";
 import app from "./app";
-import { setupAssociations } from "./models/associations";
+import { setupAssociations } from "./models/associations/associations";
 
 const PORT = 3000;
 const HOST = '0.0.0.0'; // Чтобы можно было принимать запросы с мобилки
